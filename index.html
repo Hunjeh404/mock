@@ -219,11 +219,41 @@ function home(){
   S=null; bar.classList.add('hidden'); const recs=loadRecs();
   app.innerHTML=`<h1>국어 모의고사</h1>
   <div class="sub">세트마다 6문항입니다. 답을 고르고 제출하면 맞은 문항이 표시됩니다. 정답 번호와 해설은 비밀번호가 있어야 볼 수 있습니다.</div>
-  ${SETS.map((s,i)=>{const r=recs[s.id]; const st=r?`완료 · ${r.answers.filter((a,qi)=>a===s.questions[qi].answer).length}/6 · ${new Date(r.submittedAt).toLocaleDateString('ko-KR')}`:'6문항'; return `<button class="setbtn" data-i="${i}"><b>${s.title}</b><span class="sub">${s.note} · ${st}</span></button>`;}).join('')}`;
+  ${SETS.map((s,i)=>{const r=recs[s.id]; const st=r?`완료 · ${r.answers.filter((a,qi)=>a===s.questions[qi].answer).length}/6 · ${new Date(r.submittedAt).toLocaleDateString('ko-KR')}`:'6문항'; return `<button class="setbtn" data-i="${i}"><b>${s.title}</b><span class="sub">${s.note} · ${st}</span></button>`;}).join('')}
+  <div class="row" style="margin-top:28px"><button class="btn ghost" id="parent">학부모 설정</button></div>`;
+  document.getElementById('parent').onclick=parentGate;
   app.querySelectorAll('.setbtn').forEach(b=>b.onclick=()=>{const set=SETS[+b.dataset.i]; const r=recs[set.id];
     if(r){ S={set, answers:r.answers, startedAt:new Date(r.startedAt), submittedAt:new Date(r.submittedAt), unlocked:false}; renderResult(); window.scrollTo(0,0); }
     else start(set);});
   window.scrollTo(0,0);
+}
+
+function parentGate(){
+  app.innerHTML=`<button class="btn ghost" id="back">← 세트 목록</button>
+  <h1>학부모 설정</h1>
+  <div class="card"><div class="sub">비밀번호를 넣으면 세트별 기록을 초기화할 수 있습니다.</div>
+    <form class="row" id="ppw"><input type="password" id="pw2" inputmode="numeric" autocomplete="off" placeholder="••••"><button class="btn" type="submit">열기</button></form>
+    <div id="pmsg" class="warn"></div></div>`;
+  document.getElementById('back').onclick=home;
+  document.getElementById('ppw').onsubmit=e=>{e.preventDefault();
+    if(document.getElementById('pw2').value===PASSWORD) parentPanel();
+    else document.getElementById('pmsg').textContent='비밀번호가 맞지 않습니다.';};
+  window.scrollTo(0,0);
+}
+
+function parentPanel(){
+  const recs=loadRecs();
+  app.innerHTML=`<button class="btn ghost" id="back">← 세트 목록</button>
+  <h1>학부모 설정</h1>
+  <div class="sub">초기화한 세트는 처음부터 다시 풀 수 있습니다. 지운 기록은 되돌릴 수 없으니, 필요하면 먼저 결과 화면에서 JSON을 복사해 두세요.</div>
+  ${SETS.map((s,i)=>{const r=recs[s.id];
+    const st=r?`완료 · ${r.answers.filter((a,qi)=>a===s.questions[qi].answer).length}/6 · ${new Date(r.submittedAt).toLocaleString('ko-KR')}`:'기록 없음';
+    return `<div class="card"><b>${s.title}</b> <span class="sub">${s.note}</span><div class="sub">${st}</div>
+      ${r?`<div class="row"><button class="btn ghost reset" data-i="${i}">이 세트 초기화</button></div>`:''}</div>`;}).join('')}`;
+  document.getElementById('back').onclick=home;
+  app.querySelectorAll('.reset').forEach(b=>b.onclick=()=>{const set=SETS[+b.dataset.i];
+    if(!confirm(`${set.title} 기록을 지울까요?\n지운 기록은 되돌릴 수 없습니다.`)) return;
+    const r=loadRecs(); delete r[set.id]; saveRecs(r); parentPanel();});
 }
 
 function start(set){
@@ -337,12 +367,8 @@ function renderResult(){
     <div id="pwmsg" class="warn"></div>
   </div>
   <div id="review"></div>
-  <div class="row"><button class="btn ghost" id="again">기록 지우고 다시 풀기</button></div>${S.saved===false?'<div class="warn">이 기기에 기록을 저장하지 못했습니다. 화면을 닫기 전에 JSON을 복사해 두세요.</div>':''}`;
+  ${S.saved===false?'<div class="warn">이 기기에 기록을 저장하지 못했습니다. 화면을 닫기 전에 JSON을 복사해 두세요.</div>':''}`;
   document.getElementById('back').onclick=home;
-  document.getElementById('again').onclick=()=>{
-    if(!confirm(`${set.title} 기록을 지우고 처음부터 다시 풀까요?\n지운 기록은 되돌릴 수 없습니다.`)) return;
-    const recs=loadRecs(); delete recs[set.id]; saveRecs(recs); start(set);
-  };
   const json=buildJSON();
   const box=document.getElementById('jsonbox'); box.value=json;
   document.getElementById('copy').onclick=async()=>{
