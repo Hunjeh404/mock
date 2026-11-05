@@ -62,6 +62,11 @@ public final class CameraOverlay extends View {
   private final Handler handler = new Handler(Looper.getMainLooper());
   private final Rect picture = new Rect();
   private Rect lastFrame = new Rect();
+
+  public Rect frame() {
+    return new Rect(picture);
+  }
+
   public List<Recipe> recipes = Recipe.builtIns();
   public final Map<String, Bitmap> thumbs = new HashMap<>();
   public List<CameraEngine.Lens> lenses = new ArrayList<>();
@@ -303,7 +308,8 @@ public final class CameraOverlay extends View {
     hits.clear();
     int availableW = w - safeLeft - safeRight,
         availableH = Math.max(1, (int) (l.bottomTop - l.topBottom - d(75)));
-    int[] bounds = PreviewGeometry.fitLandscape(availableW, availableH, ratio);
+    // The menu window stays portrait. Its tall frame becomes 3:2 landscape when held sideways.
+    int[] bounds = PreviewGeometry.fitPortrait(availableW, availableH, ratio);
     picture.set(
         bounds[0] + safeLeft,
         bounds[1] + (int) l.topBottom,
@@ -318,8 +324,18 @@ public final class CameraOverlay extends View {
     c.drawRect(0, picture.bottom, w, h, p);
     c.drawRect(0, picture.top, picture.left, picture.bottom, p);
     c.drawRect(picture.right, picture.top, w, picture.bottom, p);
-    if (guideRenderer != null && guideSelection != null)
-      guideRenderer.draw(c, new RectF(picture), guideSelection, 0, false);
+    boolean landscape = CaptureOrientation.isLandscape(deviceOrientation);
+    if (landscape && guideRenderer != null && guideSelection != null)
+      guideRenderer.draw(c, new RectF(picture), guideSelection, deviceOrientation, false);
+    if (!landscape) {
+      float cy = picture.centerY();
+      round(
+          c,
+          new RectF(picture.left + d(10), cy - d(27), picture.right - d(10), cy + d(27)),
+          0xeb000000,
+          8);
+      text(c, "휴대폰을 가로로 들어 촬영해주세요.", picture.centerX(), cy + d(4), 11, ACCENT, true);
+    }
     if (grid) {
       color(0x88ffffff);
       p.setStrokeWidth(d(.5f));
@@ -415,7 +431,7 @@ public final class CameraOverlay extends View {
       text(c, tip, l.manual.cx(), l.manual.cy() + d(3), 8, MUTED, true);
     }
     float sx = l.shutterX, sy = l.shutterY;
-    color(capturing || countdown > 0 ? 0xff80573e : ACCENT);
+    color(!landscape || capturing || countdown > 0 ? 0xff80573e : ACCENT);
     p.setStyle(Paint.Style.STROKE);
     p.setStrokeWidth(d(2));
     c.drawCircle(sx, sy, d(33), p);
@@ -744,6 +760,17 @@ public final class CameraOverlay extends View {
           moved = true;
           handler.removeCallbacks(hold);
         }
+        if ("opacity".equals(downHit)) {
+          if (!moved || Math.abs(dx) <= Math.abs(dy)) return true;
+          wheelTravel += x - lastX;
+          lastX = x;
+          int amount = (int) (wheelTravel / d(2));
+          if (amount != 0) {
+            wheelTravel -= amount * d(2);
+            listener.dial("opacity", amount);
+          }
+          return true;
+        }
         if (downHit != null && downHit.startsWith("wheel:")) {
           String key = downHit.substring(6);
           if (longPressed) return true;
@@ -819,7 +846,6 @@ public final class CameraOverlay extends View {
     if (target.equals("shutter")) listener.shutter();
     else if (target.equals("gallery")) listener.gallery();
     else if (target.equals("mode")) listener.openModePicker();
-    else if (target.equals("opacity")) listener.guideAppearance("opacity");
     else if (target.equals("guideColor")) listener.guideAppearance("color");
     else if (target.equals("guide")) listener.openGuides();
     else if (target.equals("manage")) listener.managePresets();

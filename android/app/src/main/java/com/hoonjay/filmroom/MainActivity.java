@@ -44,7 +44,7 @@ public final class MainActivity extends Activity implements SensorEventListener 
   private Recipe pressRecipe;
   private android.graphics.SurfaceTexture texture;
   private boolean resumed, cameraOpen, timerRunning, destroyed;
-  private int timerSeconds;
+  private int timerSeconds, timerGeneration;
   private int proIso, proEv, proAperture = -1;
   private long proTime;
   private float proFocus = -1;
@@ -352,7 +352,7 @@ public final class MainActivity extends Activity implements SensorEventListener 
                         : -1);
                 preview.setLens(
                     lens.sensorOrientation,
-                    orientation.engineRotation(),
+                    displayDegrees(),
                     lens.previewSize.getWidth(),
                     lens.previewSize.getHeight());
                 updatePeaking();
@@ -426,8 +426,14 @@ public final class MainActivity extends Activity implements SensorEventListener 
           public void onOrientationChanged(int degrees) {
             int previous = orientation.quadrant();
             orientation.update(degrees);
-            overlay.deviceOrientation = 0;
+            overlay.deviceOrientation = orientation.quadrant();
             if (previous != orientation.quadrant()) {
+              if (!orientation.isLandscape() && timerRunning) {
+                timerRunning = false;
+                timerGeneration++;
+                overlay.countdown = 0;
+                floating.busy(overlay.capturing);
+              }
               resetTouch();
               updateRotation();
               overlay.invalidate();
@@ -550,7 +556,7 @@ public final class MainActivity extends Activity implements SensorEventListener 
       CameraEngine.Lens l = engine.active();
       preview.setLens(
           l.sensorOrientation,
-          orientation.engineRotation(),
+          displayDegrees(),
           l.previewSize.getWidth(),
           l.previewSize.getHeight());
     }
@@ -598,48 +604,52 @@ public final class MainActivity extends Activity implements SensorEventListener 
   private void showGuideAppearance(String key) {
     if (busy()) return;
     if (key.equals("color")) {
-      new AlertDialog.Builder(this)
-          .setTitle("가이드 색상")
-          .setSingleChoiceItems(
-              GuideAppearance.NAMES,
-              GuideAppearance.index(guideSelection.color),
-              (d, i) -> {
-                guideSelection.color = GuideAppearance.COLORS[i];
-                saveGuideAppearance();
-                d.dismiss();
-              })
-          .setNegativeButton("닫기", null)
-          .show();
+      Dialog palette = new Dialog(this);
+      palette.requestWindowFeature(Window.FEATURE_NO_TITLE);
+      LinearLayout card = Ui.column(this);
+      Ui.title(card, "가이드 색상", palette::dismiss);
+      for (int i = 0; i < GuideAppearance.NAMES.length; i++) {
+        final int color = GuideAppearance.COLORS[i];
+        boolean selected = guideSelection.color == color;
+        LinearLayout row = Ui.row(this);
+        row.setPadding(Ui.dp(this, 14), 0, Ui.dp(this, 14), 0);
+        android.graphics.drawable.GradientDrawable background =
+            new android.graphics.drawable.GradientDrawable();
+        background.setColor(selected ? 0xff382a22 : Ui.PANEL);
+        background.setCornerRadius(Ui.dp(this, 11));
+        background.setStroke(Ui.dp(this, 1), selected ? Ui.ACCENT : 0xff3c383c);
+        row.setBackground(
+            new android.graphics.drawable.RippleDrawable(
+                android.content.res.ColorStateList.valueOf(0x2ef5a36b), background, null));
+        View swatch = new View(this);
+        android.graphics.drawable.GradientDrawable dot =
+            new android.graphics.drawable.GradientDrawable();
+        dot.setShape(android.graphics.drawable.GradientDrawable.OVAL);
+        dot.setColor(color);
+        dot.setStroke(Ui.dp(this, 1), 0xff77716c);
+        swatch.setBackground(dot);
+        row.addView(swatch, new LinearLayout.LayoutParams(Ui.dp(this, 22), Ui.dp(this, 22)));
+        TextView label =
+            Ui.text(this, GuideAppearance.NAMES[i], 14, selected ? Ui.ACCENT : Ui.TEXT);
+        label.setPadding(Ui.dp(this, 12), 0, 0, 0);
+        row.addView(label, new LinearLayout.LayoutParams(0, -2, 1));
+        TextView check = Ui.text(this, selected ? "✓" : "", 18, Ui.ACCENT);
+        row.addView(check);
+        row.setContentDescription(GuideAppearance.NAMES[i] + (selected ? ", 선택됨" : ""));
+        row.setSelected(selected);
+        row.setOnClickListener(
+            v -> {
+              guideSelection.color = color;
+              saveGuideAppearance();
+              palette.dismiss();
+            });
+        LinearLayout.LayoutParams space = new LinearLayout.LayoutParams(-1, Ui.dp(this, 46));
+        space.setMargins(0, 0, 0, Ui.dp(this, 6));
+        card.addView(row, space);
+      }
+      Ui.modal(this, palette, card);
       return;
     }
-    Dialog dialog = new Dialog(this);
-    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-    LinearLayout col = Ui.column(this);
-    Ui.title(col, "가이드 투명도", dialog::dismiss);
-    TextView value = Ui.text(this, guideSelection.opacity + "%", 20, Ui.ACCENT);
-    value.setGravity(Gravity.CENTER);
-    col.addView(value);
-    col.addView(Ui.text(this, "0: 숨김 · 100: 선명", 11, Ui.MUTED));
-    SeekBar slider = new SeekBar(this);
-    slider.setMax(100);
-    slider.setProgress(guideSelection.opacity);
-    slider.setContentDescription("가이드 투명도 0에서 100");
-    col.addView(slider, new LinearLayout.LayoutParams(-1, Ui.dp(this, 48)));
-    slider.setOnSeekBarChangeListener(
-        new SeekBar.OnSeekBarChangeListener() {
-          public void onStartTrackingTouch(SeekBar b) {}
-
-          public void onStopTrackingTouch(SeekBar b) {}
-
-          public void onProgressChanged(SeekBar b, int progress, boolean user) {
-            if (user) {
-              guideSelection.opacity = progress;
-              value.setText(progress + "%");
-              saveGuideAppearance();
-            }
-          }
-        });
-    Ui.modal(this, dialog, col);
   }
 
   private void showGuides() {
@@ -675,6 +685,10 @@ public final class MainActivity extends Activity implements SensorEventListener 
         || galleryScreen != null
         || busy()
         || guidePicker != null && guidePicker.isShowing()) return;
+    if (!orientation.isLandscape()) {
+      notice("휴대폰을 가로로 들어 촬영해주세요.");
+      return;
+    }
     if (engine.active() == null) {
       notice("RAW 카메라가 준비되지 않았습니다.");
       return;
@@ -685,22 +699,30 @@ public final class MainActivity extends Activity implements SensorEventListener 
     }
     if (timerSeconds > 0) {
       timerRunning = true;
-      tick(timerSeconds);
+      tick(timerSeconds, ++timerGeneration);
     } else shoot();
   }
 
-  private void tick(int left) {
-    if (!timerRunning || !resumed) return;
+  private void tick(int left, int generation) {
+    if (!timerRunning || !resumed || generation != timerGeneration) return;
     overlay.countdown = left;
     floating.busy(left > 0 || overlay.capturing);
     overlay.invalidate();
     if (left == 0) {
       timerRunning = false;
       shoot();
-    } else main.postDelayed(() -> tick(left - 1), 1000);
+    } else main.postDelayed(() -> tick(left - 1, generation), 1000);
   }
 
   private void shoot() {
+    // Recheck after the timer: portrait must never reach Camera2 capture.
+    if (!orientation.isLandscape()) {
+      overlay.countdown = 0;
+      floating.busy(overlay.capturing);
+      overlay.invalidate();
+      notice("휴대폰을 가로로 들어 촬영해주세요.");
+      return;
+    }
     CaptureChoice c = new CaptureChoice();
     c.id = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS", Locale.US).format(new Date());
     c.mode = overlay.mode;
@@ -716,6 +738,11 @@ public final class MainActivity extends Activity implements SensorEventListener 
   }
 
   private void changeDial(String key, int steps) {
+    if (key.equals("opacity")) {
+      guideSelection.opacity = GuideAppearance.opacity(guideSelection.opacity + steps);
+      saveGuideAppearance();
+      return;
+    }
     if (busy()) return;
     if (key.equals("lens")) {
       if (overlay.lenses.size() < 2) return;
@@ -831,12 +858,12 @@ public final class MainActivity extends Activity implements SensorEventListener 
 
   private float[] mapFocus(float x, float y) {
     CameraEngine.Lens l = engine.active();
-    int rotation = (l.sensorOrientation - orientation.engineRotation() + 360) % 360;
+    int rotation = (l.sensorOrientation - displayDegrees() + 360) % 360;
     float aspect =
         (rotation == 90 || rotation == 270)
             ? l.rawSize.getHeight() / (float) l.rawSize.getWidth()
             : l.rawSize.getWidth() / (float) l.rawSize.getHeight();
-    float frame = 1.5f;
+    float frame = overlay.frame().width() / (float) Math.max(1, overlay.frame().height());
     if (aspect > frame) x = (x - .5f) * frame / aspect + .5f;
     else y = (y - .5f) * aspect / frame + .5f;
     switch (rotation) {
@@ -964,8 +991,12 @@ public final class MainActivity extends Activity implements SensorEventListener 
         });
     TextView title = Ui.text(this, gallerySelecting ? "사진 선택" : "촬영 사진", 17, Ui.TEXT);
     header.addView(title, new LinearLayout.LayoutParams(0, -2, 1));
-    Button select = Ui.action(this, gallerySelecting ? "취소" : "선택", false);
-    header.addView(select, new LinearLayout.LayoutParams(Ui.dp(this, 56), Ui.dp(this, 40)));
+    Button select = Ui.action(this, gallerySelecting ? "취소" : "선택", gallerySelecting);
+    select.setSelected(gallerySelecting);
+    select.setEllipsize(null);
+    select.setPadding(Ui.dp(this, 14), 0, Ui.dp(this, 14), 0);
+    select.setMinWidth(Ui.dp(this, 88));
+    header.addView(select, new LinearLayout.LayoutParams(-2, Ui.dp(this, 40)));
     select.setEnabled(!deleting);
     select.setOnClickListener(
         v -> {

@@ -3,7 +3,7 @@
   "product": {
     "name": "보도사진 카메라",
     "applicationId": "com.hoonjay.presscamera",
-    "version": "1.1.0"
+    "version": "1.1.1"
   },
   "camera": {
     "defaultMode": "자동",
@@ -17,7 +17,8 @@
     "editingEnabled": false,
     "presetManagementEnabled": false,
     "orientation": "landscape",
-    "menuOrientation": "portrait"
+    "menuOrientation": "portrait",
+    "requiresLandscapeHold": true
   },
   "content": {
     "catalog": "press-guides/catalog.json",
@@ -48,6 +49,7 @@
       "파란색",
       "노란색",
       "초록색"
-    ]
+    ],
+    "opacityGesture": "horizontal-drag"
   }
 }

@@ -26,7 +26,8 @@ public final class PressConfig {
     if (camera.getDouble("ratio") != RATIO || !camera.getString("savePolicy").equals("RAW+JPG"))
       throw new IOException("보도사진 저장 정책 오류");
     if (!camera.optString("orientation").equals("landscape")
-        || !camera.optString("menuOrientation").equals("portrait"))
+        || !camera.optString("menuOrientation").equals("portrait")
+        || !camera.optBoolean("requiresLandscapeHold"))
       throw new IOException("촬영 방향 정책 오류");
     recipe =
         RecipeJson.read(
