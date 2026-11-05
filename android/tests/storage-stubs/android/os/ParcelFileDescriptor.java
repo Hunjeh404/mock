@@ -1,0 +1,1 @@
+package android.os;public class ParcelFileDescriptor implements AutoCloseable{private final java.io.File file;public ParcelFileDescriptor(java.io.File f){file=f;}public long getStatSize(){return file.length();}public void close(){}}

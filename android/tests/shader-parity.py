@@ -251,3 +251,35 @@ draw(5,0,4);read(0,0,w,h,0x1908,0x1401,result)
 original=(root/'preview-input.rgba').read_bytes()
 assert max(abs(result[i]-original[i]) for i in range(len(original)) if i%4!=3)<=1,'Color calibration contaminated neutral meter'
 print(f'PASS:27 metadata preview models/settings,331776 RGB comparisons; GPU/CPU max{worst}/255; neutral meter bypass retained. No physical ISP simulated.')
+
+# Exposure zebra is tied to the signal BEFORE shadow lift / highlight compression.
+active(0x84C0);gl('glBindTexture',None,U,U)(0x0DE1,camera_texture)
+for name,value in fixtures['cases'][0]['uniforms'].items():
+    loc=location(program,name.encode())
+    if isinstance(value,list):three(loc,1,(F*3)(*value))
+    else:one(loc,float(value))
+for name in ['previewColor','peaking','detail','noiseLuma','noiseChroma','advanced','riskSample']:one(location(program,name.encode()),0)
+one(location(program,b'zebra'),0)
+patches=bytes(sum(([255,255,255,255] if x<w//3 else [0,0,0,255] if x<2*w//3 else [110,130,150,255] for y in range(h) for x in range(w)),[]))
+tex_image(0x0DE1,0,0x1908,w,h,0,0x1908,0x1401,C.create_string_buffer(patches))
+one(location(program,b'shadows'),.04);one(location(program,b'highlights'),-.08)
+draw(5,0,4);read(0,0,w,h,0x1908,0x1401,result);no_zebra=bytes(result)
+one(location(program,b'zebra'),1)
+draw(5,0,4);read(0,0,w,h,0x1908,0x1401,result);hatched=bytes(result)
+high=low=unaffected=0
+for y in range(h):
+    for x in range(w):
+        i=(y*w+x)*4
+        changed=hatched[i:i+3]!=no_zebra[i:i+3]
+        if x<w//3:high+=changed
+        elif x<2*w//3:low+=changed
+        else:
+            assert not changed,'Zebra painted a non-clipped area'
+            unaffected+=1
+        if changed:assert hatched[i]>=no_zebra[i] and hatched[i+1]<=no_zebra[i+1] and hatched[i+2]<=no_zebra[i+2],'Zebra is not red'
+assert high>100 and low>100 and unaffected>100,'Expected highlight and shadow stripes with gaps'
+one(location(program,b'riskSample'),1)
+draw(5,0,4);read(0,0,w,h,0x1908,0x1401,result)
+assert max(abs(result[i]-patches[i]) for i in range(w*h*4) if i%4<3)<=1,'Risk sample was contaminated by preset/zebra'
+one(location(program,b'riskSample'),0);one(location(program,b'zebra'),0)
+print(f'PASS: red zebra over {high} highlight and {low} shadow pixels, midtones untouched, shadow-lift independent, risk readback unmarked.')

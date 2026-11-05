@@ -1,6 +1,7 @@
 package com.hoonjay.filmroom.guides;
 
 import android.content.Context;
+import com.hoonjay.filmroom.core.GuideAppearance;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -16,7 +17,7 @@ public final class GuideCatalog {
   public static final class Selection {
     public final LinkedHashSet<String> categoryIds = new LinkedHashSet<>();
     public String guideId = "held-prop", prop = "individual";
-    public int people = 2;
+    public int people = 2, opacity = 80, color = GuideAppearance.COLORS[0];
     public boolean visible = true;
 
     public Selection copy() {
@@ -25,6 +26,8 @@ public final class GuideCatalog {
       s.guideId = guideId;
       s.prop = prop;
       s.people = people;
+      s.opacity = opacity;
+      s.color = color;
       s.visible = visible;
       return s;
     }
@@ -36,6 +39,8 @@ public final class GuideCatalog {
         j.put("categoryIds", new JSONArray(categoryIds));
         j.put("guideId", guideId);
         j.put("people", people);
+        j.put("opacity", opacity);
+        j.put("color", color);
         j.put("prop", prop);
         j.put("visible", visible);
       } catch (JSONException e) {
@@ -107,6 +112,8 @@ public final class GuideCatalog {
   }
 
   public void normalize(Selection s) {
+    s.opacity = GuideAppearance.opacity(s.opacity);
+    s.color = GuideAppearance.color(s.color);
     if (!byId.containsKey(s.guideId)) s.guideId = guides.get(0).optString("id");
     JSONObject g = guide(s.guideId);
     JSONArray n = g.optJSONArray("peopleOptions");
@@ -126,6 +133,8 @@ public final class GuideCatalog {
       JSONObject j = new JSONObject(json);
       s.guideId = j.optString("guideId", s.guideId);
       s.people = j.optInt("people", s.people);
+      s.opacity = j.optInt("opacity", s.opacity);
+      s.color = j.optInt("color", s.color);
       s.prop = j.optString("prop", s.prop);
       s.visible = j.optBoolean("visible", true);
       JSONArray a = j.optJSONArray("categoryIds");

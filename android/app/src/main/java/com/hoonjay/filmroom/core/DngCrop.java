@@ -22,6 +22,14 @@ public final class DngCrop {
   }
 
   public static void apply(File file) throws IOException {
+    apply(file, 0, false);
+  }
+
+  public static void applyLandscape(File file, int rotation) throws IOException {
+    apply(file, rotation, true);
+  }
+
+  private static void apply(File file, int rotation, boolean landscape) throws IOException {
     try (RandomAccessFile f = new RandomAccessFile(file, "rw")) {
       int a = f.readUnsignedByte(), b = f.readUnsignedByte();
       boolean le = a == 'I' && b == 'I';
@@ -56,6 +64,14 @@ public final class DngCrop {
           ch = (aw >= ah ? 2 : 3) * unit,
           x = (aw - cw) / 2,
           y = (ah - ch) / 2;
+      if (landscape) {
+        Geometry g = Geometry.landscape((int) aw, (int) ah, rotation, 1.5);
+        boolean swap = rotation % 180 != 0;
+        cw = swap ? g.height : g.width;
+        ch = swap ? g.width : g.height;
+        x = Math.min(g.sourceX(0, 0), g.sourceX(g.width - 1, g.height - 1));
+        y = Math.min(g.sourceY(0, 0), g.sourceY(g.width - 1, g.height - 1));
+      }
       long start = (f.length() + 3) & ~3L;
       if (start > 0xffffff00L) throw new IOException("DNG too large");
       f.seek(start);

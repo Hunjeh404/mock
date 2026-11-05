@@ -61,6 +61,11 @@ public final class MainActivity extends Activity implements SensorEventListener 
   private CaptureChoice capture;
   private Bitmap galleryBitmap, thumbBitmap;
   private int galleryToken;
+  private ScrollView galleryScrollView;
+  private int galleryScrollY;
+  private boolean gallerySelecting, deleting;
+  private final LinkedHashSet<String> gallerySelected = new LinkedHashSet<>();
+  private String highlightText, shadowText;
   private final DisplayManager.DisplayListener displayListener =
       new DisplayManager.DisplayListener() {
         public void onDisplayAdded(int id) {}
@@ -85,7 +90,10 @@ public final class MainActivity extends Activity implements SensorEventListener 
     prefs = getSharedPreferences("press-camera-v1", MODE_PRIVATE);
     stores = new Stores(this);
     try {
-      pressRecipe = new PressConfig(this).recipe;
+      PressConfig config = new PressConfig(this);
+      pressRecipe = config.recipe;
+      highlightText = config.highlightWarning;
+      shadowText = config.shadowWarning;
       catalog = new GuideCatalog(this);
       guideSelection = catalog.restore(prefs.getString("guide", ""));
     } catch (Exception error) {
@@ -132,6 +140,13 @@ public final class MainActivity extends Activity implements SensorEventListener 
         new CameraPreview(
             this,
             new CameraPreview.Listener() {
+              public void clipping(boolean high, boolean low) {
+                if (destroyed || overlay == null) return;
+                overlay.highlightRisk = high;
+                overlay.shadowRisk = low;
+                overlay.invalidate();
+              }
+
               public void surface(android.graphics.SurfaceTexture t) {
                 if (texture != t && cameraOpen) {
                   engine.close();
@@ -184,7 +199,11 @@ public final class MainActivity extends Activity implements SensorEventListener 
               }
 
               public void openModePicker() {
-                showModes();
+                chooseMode(overlay.mode.equals("자동") ? "프로" : "자동");
+              }
+
+              public void guideAppearance(String key) {
+                showGuideAppearance(key);
               }
 
               public void mode(String mode) {
@@ -265,6 +284,8 @@ public final class MainActivity extends Activity implements SensorEventListener 
                 preview.setFrame(frame);
               }
             });
+    overlay.highlightWarning = highlightText;
+    overlay.shadowWarning = shadowText;
     overlay.recipe = pressRecipe.copy();
     overlay.recipes = Collections.singletonList(pressRecipe);
     overlay.mode = "자동";
@@ -331,7 +352,7 @@ public final class MainActivity extends Activity implements SensorEventListener 
                         : -1);
                 preview.setLens(
                     lens.sensorOrientation,
-                    displayDegrees(),
+                    orientation.engineRotation(),
                     lens.previewSize.getWidth(),
                     lens.previewSize.getHeight());
                 updatePeaking();
@@ -403,9 +424,12 @@ public final class MainActivity extends Activity implements SensorEventListener 
     orientationListener =
         new OrientationEventListener(this, SensorManager.SENSOR_DELAY_UI) {
           public void onOrientationChanged(int degrees) {
+            int previous = orientation.quadrant();
             orientation.update(degrees);
-            if (overlay.deviceOrientation != orientation.quadrant()) {
-              overlay.deviceOrientation = orientation.quadrant();
+            overlay.deviceOrientation = 0;
+            if (previous != orientation.quadrant()) {
+              resetTouch();
+              updateRotation();
               overlay.invalidate();
             }
           }
@@ -526,7 +550,7 @@ public final class MainActivity extends Activity implements SensorEventListener 
       CameraEngine.Lens l = engine.active();
       preview.setLens(
           l.sensorOrientation,
-          displayDegrees(),
+          orientation.engineRotation(),
           l.previewSize.getWidth(),
           l.previewSize.getHeight());
     }
@@ -564,19 +588,58 @@ public final class MainActivity extends Activity implements SensorEventListener 
     overlay.invalidate();
   }
 
-  private void showModes() {
+  private void saveGuideAppearance() {
+    catalog.normalize(guideSelection);
+    overlay.guideSelection = guideSelection.copy();
+    prefs.edit().putString("guide", guideSelection.json().toString()).apply();
+    overlay.invalidate();
+  }
+
+  private void showGuideAppearance(String key) {
     if (busy()) return;
-    new AlertDialog.Builder(this)
-        .setTitle("촬영 모드")
-        .setSingleChoiceItems(
-            new String[] {"자동", "프로"},
-            overlay.mode.equals("자동") ? 0 : 1,
-            (d, i) -> {
-              chooseMode(i == 0 ? "자동" : "프로");
-              d.dismiss();
-            })
-        .setNegativeButton("닫기", null)
-        .show();
+    if (key.equals("color")) {
+      new AlertDialog.Builder(this)
+          .setTitle("가이드 색상")
+          .setSingleChoiceItems(
+              GuideAppearance.NAMES,
+              GuideAppearance.index(guideSelection.color),
+              (d, i) -> {
+                guideSelection.color = GuideAppearance.COLORS[i];
+                saveGuideAppearance();
+                d.dismiss();
+              })
+          .setNegativeButton("닫기", null)
+          .show();
+      return;
+    }
+    Dialog dialog = new Dialog(this);
+    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+    LinearLayout col = Ui.column(this);
+    Ui.title(col, "가이드 투명도", dialog::dismiss);
+    TextView value = Ui.text(this, guideSelection.opacity + "%", 20, Ui.ACCENT);
+    value.setGravity(Gravity.CENTER);
+    col.addView(value);
+    col.addView(Ui.text(this, "0: 숨김 · 100: 선명", 11, Ui.MUTED));
+    SeekBar slider = new SeekBar(this);
+    slider.setMax(100);
+    slider.setProgress(guideSelection.opacity);
+    slider.setContentDescription("가이드 투명도 0에서 100");
+    col.addView(slider, new LinearLayout.LayoutParams(-1, Ui.dp(this, 48)));
+    slider.setOnSeekBarChangeListener(
+        new SeekBar.OnSeekBarChangeListener() {
+          public void onStartTrackingTouch(SeekBar b) {}
+
+          public void onStopTrackingTouch(SeekBar b) {}
+
+          public void onProgressChanged(SeekBar b, int progress, boolean user) {
+            if (user) {
+              guideSelection.opacity = progress;
+              value.setText(progress + "%");
+              saveGuideAppearance();
+            }
+          }
+        });
+    Ui.modal(this, dialog, col);
   }
 
   private void showGuides() {
@@ -768,15 +831,12 @@ public final class MainActivity extends Activity implements SensorEventListener 
 
   private float[] mapFocus(float x, float y) {
     CameraEngine.Lens l = engine.active();
-    int rotation = (l.sensorOrientation - displayDegrees() + 360) % 360;
+    int rotation = (l.sensorOrientation - orientation.engineRotation() + 360) % 360;
     float aspect =
         (rotation == 90 || rotation == 270)
             ? l.rawSize.getHeight() / (float) l.rawSize.getWidth()
             : l.rawSize.getWidth() / (float) l.rawSize.getHeight();
-    float frame =
-        getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE
-            ? 1.5f
-            : 1 / 1.5f;
+    float frame = 1.5f;
     if (aspect > frame) x = (x - .5f) * frame / aspect + .5f;
     else y = (y - .5f) * aspect / frame + .5f;
     switch (rotation) {
@@ -885,61 +945,205 @@ public final class MainActivity extends Activity implements SensorEventListener 
 
   private void showGallery() {
     if (busy()) return;
+    if (galleryScrollView != null) galleryScrollY = galleryScrollView.getScrollY();
     resetTouch();
     engine.close();
     cameraOpen = false;
     galleryToken++;
     if (galleryScreen != null) root.removeView(galleryScreen);
     LinearLayout column = Ui.column(this);
-    Ui.title(column, "촬영 사진", this::closeGallery);
-    TextView info = Ui.text(this, "RAW 원본 + 보도 클린 JPG · 3:2", 11, Ui.MUTED);
-    column.addView(info);
+    LinearLayout header = Ui.row(this);
+    Button back = Ui.action(this, "‹", false);
+    back.setContentDescription("촬영으로 돌아가기");
+    header.addView(back, new LinearLayout.LayoutParams(Ui.dp(this, 40), Ui.dp(this, 44)));
+    back.setOnClickListener(
+        v -> {
+          gallerySelecting = false;
+          gallerySelected.clear();
+          closeGallery();
+        });
+    TextView title = Ui.text(this, gallerySelecting ? "사진 선택" : "촬영 사진", 17, Ui.TEXT);
+    header.addView(title, new LinearLayout.LayoutParams(0, -2, 1));
+    Button select = Ui.action(this, gallerySelecting ? "취소" : "선택", false);
+    header.addView(select, new LinearLayout.LayoutParams(Ui.dp(this, 56), Ui.dp(this, 40)));
+    select.setEnabled(!deleting);
+    select.setOnClickListener(
+        v -> {
+          gallerySelecting = !gallerySelecting;
+          gallerySelected.clear();
+          showGallery();
+        });
+    column.addView(header);
+    List<JSONObject> shots = stores.shots();
+    Set<String> available = new HashSet<>();
+    for (JSONObject shot : shots) available.add(shot.optString("id"));
+    gallerySelected.retainAll(available);
+    TextView count =
+        Ui.text(
+            this,
+            deleting ? "사진을 삭제하고 있습니다." : gallerySelecting ? gallerySelected.size() + "장 선택됨" : "",
+            11,
+            Ui.MUTED);
+    column.addView(count);
+    if (gallerySelecting) {
+      LinearLayout actions = Ui.row(this);
+      Button all = Ui.action(this, "전체 선택", false),
+          remove = Ui.action(this, "삭제 (" + gallerySelected.size() + ")", true);
+      actions.addView(all, new LinearLayout.LayoutParams(0, Ui.dp(this, 40), 1));
+      actions.addView(remove, new LinearLayout.LayoutParams(0, Ui.dp(this, 40), 1));
+      all.setEnabled(!deleting);
+      remove.setEnabled(!deleting && !gallerySelected.isEmpty());
+      all.setOnClickListener(
+          v -> {
+            for (JSONObject shot : shots)
+              if (deletable(shot)) gallerySelected.add(shot.optString("id"));
+            showGallery();
+          });
+      remove.setOnClickListener(
+          v -> {
+            List<JSONObject> selected = new ArrayList<>();
+            for (JSONObject shot : shots)
+              if (gallerySelected.contains(shot.optString("id"))) selected.add(shot);
+            confirmDelete(selected);
+          });
+      column.addView(actions);
+    }
     ScrollView scroll = new ScrollView(this);
+    galleryScrollView = scroll;
+    scroll.post(() -> scroll.scrollTo(0, galleryScrollY));
     LinearLayout list = new LinearLayout(this);
     list.setOrientation(1);
     scroll.addView(list);
     column.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1));
-    List<JSONObject> shots = stores.shots();
     if (shots.isEmpty()) list.addView(Ui.text(this, "아직 촬영한 사진이 없습니다.", 14, Ui.TEXT));
-    for (JSONObject s : shots) {
+    for (JSONObject shot : shots) {
+      String id = shot.optString("id");
       LinearLayout row = Ui.row(this);
+      CheckBox check = null;
+      if (gallerySelecting) {
+        check = new CheckBox(this);
+        check.setChecked(gallerySelected.contains(id));
+        check.setEnabled(!deleting && deletable(shot));
+        row.addView(check, new LinearLayout.LayoutParams(Ui.dp(this, 38), Ui.dp(this, 60)));
+        final CheckBox checkbox = check;
+        checkbox.setOnCheckedChangeListener(
+            (button, on) -> {
+              if (on) gallerySelected.add(id);
+              else gallerySelected.remove(id);
+              showGallery();
+            });
+      }
       ImageView image = new ImageView(this);
       image.setScaleType(ImageView.ScaleType.CENTER_CROP);
       row.addView(image, new LinearLayout.LayoutParams(Ui.dp(this, 90), Ui.dp(this, 60)));
       LinearLayout words = new LinearLayout(this);
       words.setOrientation(1);
-      TextView name = Ui.text(this, s.optString("id"), 12, Ui.TEXT);
-      words.addView(name);
-      String status = s.optString("status");
+      words.addView(Ui.text(this, id, 12, Ui.TEXT));
+      String status = shot.optString("status");
       words.addView(
           Ui.text(
               this,
               status.equals("ready")
-                  ? s.optInt("width") + " × " + s.optInt("height") + " · RAW+JPG"
-                  : status.equals("error") ? "JPG 저장 실패 · RAW 보존" : "JPG 저장 중",
+                  ? shot.optInt("width") + " × " + shot.optInt("height")
+                  : status.equals("error") ? "저장 오류 · 원본 보존" : "사진 저장 중",
               10,
               Ui.MUTED));
       row.addView(words, new LinearLayout.LayoutParams(0, -2, 1));
-      LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, Ui.dp(this, 74));
-      list.addView(row, lp);
-      File f = new File(stores.createShot(s.optString("id")), "thumb.jpg");
+      list.addView(row, new LinearLayout.LayoutParams(-1, Ui.dp(this, 74)));
+      File f = new File(stores.createShot(id), "thumb.jpg");
       images.execute(
           () -> {
-            Bitmap b = BitmapFactory.decodeFile(f.getPath());
+            Bitmap bitmap = BitmapFactory.decodeFile(f.getPath());
             main.post(
                 () -> {
-                  if (!destroyed && galleryScreen == column) image.setImageBitmap(b);
-                  else if (b != null) b.recycle();
+                  if (!destroyed && galleryScreen == column) image.setImageBitmap(bitmap);
+                  else if (bitmap != null) bitmap.recycle();
                 });
           });
-      row.setOnClickListener(v -> showPhoto(s));
+      row.setOnClickListener(
+          v -> {
+            if (deleting) return;
+            if (gallerySelecting) {
+              if (!deletable(shot)) return;
+              if (!gallerySelected.add(id)) gallerySelected.remove(id);
+              showGallery();
+            } else showPhoto(shot);
+          });
+      row.setOnLongClickListener(
+          v -> {
+            if (deleting || !deletable(shot)) return true;
+            gallerySelecting = true;
+            gallerySelected.add(id);
+            showGallery();
+            return true;
+          });
     }
     galleryScreen = column;
     cameraLayer.setVisibility(View.INVISIBLE);
     root.addView(column, new FrameLayout.LayoutParams(-1, -1));
   }
 
+  private boolean deletable(JSONObject shot) {
+    String status = shot.optString("status");
+    return !processor.isQueued(shot.optString("id"))
+        && !status.equals("raw_saved")
+        && !status.equals("processing");
+  }
+
+  private void confirmDelete(List<JSONObject> rows) {
+    if (deleting || rows.isEmpty()) return;
+    List<JSONObject> selected = new ArrayList<>(rows);
+    for (JSONObject shot : selected)
+      if (!deletable(shot)) {
+        notice("사진 저장이 끝난 뒤 삭제해주세요.");
+        return;
+      }
+    new AlertDialog.Builder(this)
+        .setTitle(selected.size() == 1 ? "사진 삭제" : "선택한 사진 삭제")
+        .setMessage(selected.size() + "장의 RAW와 JPG를 함께 삭제할까요?")
+        .setNegativeButton("취소", null)
+        .setPositiveButton(
+            "삭제",
+            (dialog, which) -> {
+              if (deleting) return;
+              deleting = true;
+              showGallery();
+              images.execute(
+                  () -> {
+                    int failed = 0;
+                    for (JSONObject shot : selected)
+                      try {
+                        if (processor.isQueued(shot.optString("id")))
+                          throw new IOException("사진 저장 중");
+                        stores.deleteShot(shot);
+                      } catch (Exception e) {
+                        failed++;
+                      }
+                    final int failures = failed;
+                    main.post(
+                        () -> {
+                          deleting = false;
+                          if (destroyed) return;
+                          gallerySelected.clear();
+                          gallerySelecting = false;
+                          showGallery();
+                          refreshThumb();
+                          notice(
+                              failures == 0
+                                  ? selected.size() + "장을 삭제했습니다."
+                                  : (selected.size() - failures)
+                                      + "장 삭제 · "
+                                      + failures
+                                      + "장 삭제 실패");
+                        });
+                  });
+            })
+        .show();
+  }
+
   private void closeGallery() {
+    galleryScrollView = null;
+    galleryScrollY = 0;
     galleryToken++;
     if (galleryScreen != null) {
       root.removeView(galleryScreen);
@@ -961,7 +1165,18 @@ public final class MainActivity extends Activity implements SensorEventListener 
     }
     int token = ++galleryToken;
     LinearLayout col = Ui.column(this);
-    Ui.title(col, "보도사진", this::showGallery);
+    LinearLayout header = Ui.row(this);
+    Button back = Ui.action(this, "‹", false);
+    back.setContentDescription("사진 목록으로 돌아가기");
+    header.addView(back, new LinearLayout.LayoutParams(Ui.dp(this, 40), Ui.dp(this, 44)));
+    back.setOnClickListener(v -> showGallery());
+    header.addView(Ui.text(this, "보도사진", 17, Ui.TEXT), new LinearLayout.LayoutParams(0, -2, 1));
+    Button delete = Ui.action(this, "삭제", false);
+    delete.setContentDescription("이 사진의 RAW와 JPG 삭제");
+    header.addView(delete, new LinearLayout.LayoutParams(Ui.dp(this, 56), Ui.dp(this, 40)));
+    delete.setEnabled(!deleting && deletable(shot));
+    delete.setOnClickListener(v -> confirmDelete(Collections.singletonList(shot)));
+    col.addView(header);
     ImageView image = new ImageView(this);
     image.setScaleType(ImageView.ScaleType.FIT_CENTER);
     col.addView(image, new LinearLayout.LayoutParams(-1, 0, 1));
@@ -1017,7 +1232,11 @@ public final class MainActivity extends Activity implements SensorEventListener 
       return;
     }
     if (galleryScreen != null) {
-      closeGallery();
+      if (gallerySelecting) {
+        gallerySelecting = false;
+        gallerySelected.clear();
+        showGallery();
+      } else closeGallery();
       return;
     }
     super.onBackPressed();

@@ -1,0 +1,1 @@
+package android.os;public class Environment{public static final String MEDIA_MOUNTED="mounted",MEDIA_MOUNTED_READ_ONLY="mounted_ro";public static String state=MEDIA_MOUNTED;public static String getExternalStorageState(){return state;}}

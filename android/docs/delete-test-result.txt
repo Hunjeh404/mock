@@ -1,0 +1,1 @@
+PASS: 29 production Stores checks; missing URI deletion, paired-file fallbacks, metadata preservation, permissions, unmounted volume, recovery and tombstones. Host ContentResolver adapter, not Android MediaStore device I/O.

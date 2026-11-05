@@ -1,13 +1,16 @@
-# 보도사진 카메라 1.0.0
+# 보도사진 카메라 1.1.0
 
 FilmRoom Android 0.1.26의 RAW 촬영 엔진을 바탕으로 만든 보도사진 촬영 전용 앱입니다.
 
 - 기본 자동 모드: ISO·셔터·EV·초점 다이얼을 숨기고 자동 제어
 - 프로 모드: ISO·셔터·EV·초점 다이얼 표시, 렌즈 지원 시 조리개·ND 표시
 - 보도 클린 프리셋 하나를 미리보기와 JPG 저장에 자동 적용
-- RAW(DNG)+최대 품질 JPG 동시 저장, 구도는 가로 3:2 / 세로 2:3 고정
+- RAW(DNG)+최대 품질 JPG 동시 저장, 구도는 휴대폰 방향과 무관하게 가로 3:2 고정(메뉴는 세로)
 - 보도자료 분류 복수 선택, 키워드 동시 추천, 사진 20종의 촬영 구도 가이드
 - 가이드 선은 뷰파인더에만 표시하고 사진에는 합성하지 않음
+- 명부·암부에 빨간 경고 빗금, 아래 검은 배경/테마색 안내문. 사진에는 미합성
+- 모드 버튼을 누를 때마다 자동/프로 전환, 가이드 투명도 0~100 및 7색 선택
+- 사진 확인 화면 우측 상단 삭제, 목록의 복수 선택 삭제 지원
 - 사진 확인·RAW+JPG 공유 지원, 편집실·프리셋 관리·인물·별사진·불꽃놀이 모드는 제거
 
 기존 FilmRoom과 별도 앱으로 설치됩니다. 앱 ID는 `com.hoonjay.presscamera`이며 Android 11(API 30) 이상, Camera2 RAW 촬영을 지원하는 후면 렌즈가 필요합니다. 별도 앱이므로 기존 FilmRoom의 사진·설정을 읽거나 변경하지 않습니다.
@@ -43,7 +46,7 @@ export ANDROID_SDK_ROOT=/path/to/android-sdk
 bash scripts/build-apk.sh
 ```
 
-결과: `dist/PressCamera-Android-1.0.0.apk`
+결과: `dist/PressCamera-Android-1.1.0.apk`
 
 빌드 스크립트는 앱 ID·버전·namespace를 `app/build.gradle`에서 읽습니다. 버전을 바꿀 때 `app/build.gradle`과 제품 매니페스트의 `product.version`을 함께 갱신하세요. 개발용 서명 키는 `signing/debug.keystore`에 있으며 Git에는 올리지 않습니다. 같은 앱을 업데이트할 때 동일한 서명 키를 사용해야 합니다. `PRESS_SIGNING_KEYSTORE`로 다른 위치의 개발 키를 지정할 수 있습니다. Play 배포용 릴리스 키 관리는 별도입니다.
 
@@ -55,6 +58,7 @@ Android Studio에서는 이 폴더를 열고 앱 모듈을 빌드할 수 있습�
 bash scripts/test-press.sh
 bash scripts/test-guides.sh
 bash scripts/test-core.sh
+bash scripts/test-storage.sh
 bash scripts/test-capture-focus.sh
 bash scripts/test-shader.sh
 ```
@@ -65,10 +69,14 @@ bash scripts/test-shader.sh
 
 ## RAW와 비율
 
-JPG는 리샘플링 없이 중앙을 잘라 정확한 3:2 또는 2:3 정수 비율로 저장합니다. DNG는 모든 센서 샘플·색상 보정·노출 메타데이터를 보존하고 `DefaultCropOrigin`/`DefaultCropSize`만 같은 3:2 구도로 설정합니다. 따라서 기본 크롭을 무시하는 RAW 뷰어에서는 원래 센서 비율이 보일 수 있습니다. RAW에는 보도 클린 색상 프리셋을 구워 넣지 않습니다.
+JPG는 회전을 적용한 뒤 리샘플링 없이 중앙을 잘라 항상 가로 3:2 정수 비율로 저장합니다. DNG는 모든 센서 샘플·색상 보정·노출 메타데이터를 보존하고 `DefaultCropOrigin`/`DefaultCropSize`만 같은 3:2 구도로 설정합니다. 따라서 기본 크롭을 무시하는 RAW 뷰어에서는 원래 센서 비율이 보일 수 있습니다. RAW에는 보도 클린 색상 프리셋을 구워 넣지 않습니다.
 
 사진은 시스템 사진첩의 `Pictures/PressCamera`에 `PRESS_<timestamp>_RAW.dng`, `PRESS_<timestamp>_JPG.jpg` 한 쌍으로 저장됩니다. JPG 처리 실패 시 먼저 확보한 RAW는 보존되며 앱을 다시 실행하면 미완료 작업을 복구합니다.
 
 ## 검증 범위
 
 소스 컴파일·APK 정렬/서명, 분류와 추천, 고정 비율, DNG 센서 데이터 보존, 초점 대기 정책, 실제 GLSL의 시험 이미지 렌더링을 확인했습니다. 실제 휴대폰에서 AF·AE, 렌즈별 RAW 스트림, 플래시, 회전, 팝업 키보드 높이, 장시간 연속 촬영과 실사진 화질은 별도 확인이 필요합니다.
+
+## 명부·암부 경고
+
+보정 프리셋이 검은색을 밝히거나 흰색을 압축하기 전의 미리보기 촬영 신호를 검사합니다. R/G/B 중 하나가 250/255 이상이면 명부, 모든 채널이 5/255 이하이면 암부 위험으로 표시합니다. 안내 문구는 제품 매니페스트의 warnings에서 바꿀 수 있습니다. 실제 RAW 센서 데이터 손실을 단정하는 기능은 아니며, 미리보기 처리와 실제 센서의 차이가 있습니다. 가이드 투명도·색상을 바꿔도 경고 빗금은 빨간색입니다.

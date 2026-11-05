@@ -1,0 +1,1 @@
+package android.database;public class Cursor implements AutoCloseable{private final boolean exists,trashed;public Cursor(boolean e,boolean t){exists=e;trashed=t;}public boolean moveToFirst(){return exists;}public int getColumnIndex(String key){return 0;}public int getInt(int i){return trashed?1:0;}public void close(){}}

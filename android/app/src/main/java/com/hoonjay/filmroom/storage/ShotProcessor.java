@@ -179,6 +179,7 @@ public final class ShotProcessor {
         if(local.exists())local.delete();
         main.post(() -> {queued.remove(id);listener.complete(shot);});return;
       }
+      if(!gallery){source=new LandscapeSource(source,rotation);rotation=0;ratio=1.5;}
       source=EditedSource.resize(new EditedSource(source,rotation,ratio,EditJson.read(shot.optJSONObject("edit"))),shot.optInt("outputLongEdge",0));
       rotation=0;ratio=EditedSource.ratio(source);
       int savedWidth=source.width(),savedHeight=source.height(),jpegQuality=0;

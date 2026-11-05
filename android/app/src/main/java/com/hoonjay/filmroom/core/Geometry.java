@@ -13,18 +13,35 @@ public final class Geometry {
       top;
 
   public Geometry(int sourceWidth, int sourceHeight, int rotation, double longShortRatio) {
+    this(sourceWidth, sourceHeight, rotation, longShortRatio, false);
+  }
+
+  public static Geometry landscape(int width, int height, int rotation, double ratio) {
+    return new Geometry(width, height, rotation, ratio, true);
+  }
+
+  private Geometry(
+      int sourceWidth, int sourceHeight, int rotation, double longShortRatio, boolean landscape) {
     this.sourceWidth = sourceWidth;
     this.sourceHeight = sourceHeight;
     this.rotation = ((rotation % 360) + 360) % 360;
     boolean swap = this.rotation == 90 || this.rotation == 270;
     orientedWidth = swap ? sourceHeight : sourceWidth;
     orientedHeight = swap ? sourceWidth : sourceHeight;
-    double ratio = orientedWidth >= orientedHeight ? longShortRatio : 1 / longShortRatio;
+    boolean horizontal = landscape || orientedWidth >= orientedHeight;
+    double ratio = horizontal ? longShortRatio : 1 / longShortRatio;
     int w = orientedWidth, h = orientedHeight;
-    if(Math.abs(w/(double)h-ratio)<1e-9){} // exact full frame must not lose a row to rounding
+    if (Math.abs(w / (double) h - ratio) < 1e-9) {
+    } // exact full frame must not lose a row to rounding
     else if (w / (double) h > ratio) w = (int) Math.floor(h * ratio);
     else h = (int) Math.floor(w / ratio);
-    if(Math.abs(longShortRatio-1.5)<1e-9){int unit=orientedWidth>=orientedHeight?Math.min(w/3,h/2):Math.min(w/2,h/3);if(unit>=1){w=(orientedWidth>=orientedHeight?3:2)*unit;h=(orientedWidth>=orientedHeight?2:3)*unit;}}
+    if (Math.abs(longShortRatio - 1.5) < 1e-9) {
+      int unit = horizontal ? Math.min(w / 3, h / 2) : Math.min(w / 2, h / 3);
+      if (unit >= 1) {
+        w = (horizontal ? 3 : 2) * unit;
+        h = (horizontal ? 2 : 3) * unit;
+      }
+    }
     width = Math.max(1, w);
     height = Math.max(1, h);
     left = (orientedWidth - width) / 2;

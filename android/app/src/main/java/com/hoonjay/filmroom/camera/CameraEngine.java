@@ -1123,7 +1123,7 @@ public final class CameraEngine {
             p.rotation == 90 ? 6 : p.rotation == 180 ? 3 : p.rotation == 270 ? 8 : 1);
         creator.writeImage(out, p.image);
       }
-      DngCrop.apply(tmp);
+      DngCrop.applyLandscape(tmp,p.rotation);
       if (!tmp.renameTo(p.path)) throw new IOException("RAW 원본 파일 저장 실패");
       JSONObject meta =
           RawMetadata.capture(

@@ -14,7 +14,7 @@ public final class FilmShader {
         + "if(rot>269.)p=vec2(p.y,1.-p.x);else if(rot>179.)p=1.-p;"
         + "else if(rot>89.)p=vec2(1.-p.y,p.x);return (st*vec4(p,0.,1.)).xy;}"
         + "vec3 sampleCam(vec2 p){return previewBase(texture2D(cam,coord(p)).rgb);}"
-        + "uniform float noiseLuma,noiseChroma,detail;"
+        + "uniform float noiseLuma,noiseChroma,detail,zebra,riskSample;"
         + "vec3 filteredCam(vec2 pos){vec3 c=sampleCam(pos);if(noiseLuma+noiseChroma+abs(skinTexture)<.0001)return c;float skin=abs(skinTexture)<.0001?0.:skinMask(c)*abs(skinTexture);if(noiseLuma+noiseChroma<.0001&&skin<=0.)return c;"
         + "vec3 linC=vec3(lin(c.r),lin(c.g),lin(c.b));float y0=luma(linC),sigma=.012+.055*max(noiseLuma,noiseChroma),skinSigma=.02+.08*abs(skinTexture),sy=0.,sr=0.,sb=0.,total=0.,skinY=0.,skinR=0.,skinB=0.,skinTotal=0.;"
         + "for(int j=-2;j<=2;j++)for(int i=-2;i<=2;i++){if((i< -1||i>1||j< -1||j>1)&&abs(skinTexture)<.0001)continue;vec3 n=sampleCam(pos+vec2(float(i),float(j))*pixelStep/1.5);n=vec3(lin(n.r),lin(n.g),lin(n.b));float yy=luma(n),d=yy-y0;"
@@ -26,19 +26,19 @@ public final class FilmShader {
         + "vec3 detailCam(vec2 pos){vec3 c=filteredCam(pos);if(detail<=0.)return c;vec3 v=vec3(lin(c.r),lin(c.g),lin(c.b));vec2 e=max(pixelStep/1.5,vec2(.00001));vec3 a=sampleCam(pos-vec2(e.x,0.)),b=sampleCam(pos+vec2(e.x,0.)),d=sampleCam(pos-vec2(0.,e.y)),f=sampleCam(pos+vec2(0.,e.y));float neighbor=(luma(vec3(lin(a.r),lin(a.g),lin(a.b)))+luma(vec3(lin(b.r),lin(b.g),lin(b.b)))+luma(vec3(lin(d.r),lin(d.g),lin(d.b)))+luma(vec3(lin(f.r),lin(f.g),lin(f.b))))*.25;v=max(vec3(0.),v+clamp((luma(v)-neighbor)*detail*strength,-.012,.012));return vec3(enc(v.r),enc(v.g),enc(v.b));}"
         + "vec3 glowSample(vec2 pos){vec3 c=filmGrade(filteredCam(pos),pos,0.,0.);"
         + "return c*clamp((luma(c)-.6)/.4,0.,1.);}"
-        + "void main(){float noise=fract(sin(dot(floor(uv*vec2(720.,1080.)),"
+        + "void main(){vec3 signalColor=sampleCam(uv);if(riskSample>.5){gl_FragColor=vec4(signalColor,1.);return;}float noise=fract(sin(dot(floor(uv*vec2(720.,1080.)),"
         + "vec2(12.9898,78.233)))*43758.5453)-.5;"
         + "vec3 c=filmGrade(detailCam(uv),uv,noise,vignette);"
         + "if(bloom>0.&&strength>0.){vec3 glow=(glowSample(uv+vec2(.02,0.))"
         + "+glowSample(uv-vec2(.02,0.))+glowSample(uv+vec2(0.,.02))"
         + "+glowSample(uv-vec2(0.,.02)))*.25;c+=glow*bloom*.22*strength;}"
-        + "if(peaking>.5){vec2 e=max(pixelStep,vec2(.00001));"
+        + "vec3 riskColor=clamp(signalColor,0.,1.);if(peaking>.5){vec2 e=max(pixelStep,vec2(.00001));"
         + "float a=luma(sampleCam(uv-vec2(e.x,0.))),b=luma(sampleCam(uv+vec2(e.x,0.)));"
         + "float d=luma(sampleCam(uv-vec2(0.,e.y))),f=luma(sampleCam(uv+vec2(0.,e.y)));"
         + "float edge=length(vec2(b-a,f-d));float fine=abs(luma(sampleCam(uv))-(a+b+d+f)*.25);"
         + "float mask=smoothstep(.055,.16,edge)*smoothstep(.008,.04,fine);"
         + "float hatch=1.-step(.48,fract((gl_FragCoord.x+gl_FragCoord.y)/8.));"
-        + "c=mix(c,peakColor,mask*hatch*peakOpacity);}gl_FragColor=vec4(clamp(c,0.,1.),1.);}";
+        + "c=mix(c,peakColor,mask*hatch*peakOpacity);}if(zebra>.5){float risk=max(step(250./255.,max(riskColor.r,max(riskColor.g,riskColor.b))),1.-step(5.5/255.,max(riskColor.r,max(riskColor.g,riskColor.b))));float stripe=1.-step(.5,fract((gl_FragCoord.x+gl_FragCoord.y)/12.));c=mix(c,vec3(1.,0.,0.),risk*stripe*.72);}gl_FragColor=vec4(clamp(c,0.,1.),1.);}";
   }
 
 }

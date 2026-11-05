@@ -4,6 +4,10 @@ import json,math
 root=Path(__file__).resolve().parents[1];assets=root/'app/src/main/assets'
 manifest=json.loads((assets/'press-camera.manifest.json').read_text());assert manifest['schemaVersion']==1
 policy=manifest['camera'];assert policy['ratio']==1.5 and policy['savePolicy']=='RAW+JPG';assert policy['modes']==['자동','프로'] and policy['defaultMode']=='자동';assert not policy['editingEnabled'] and not policy['presetManagementEnabled']
+assert policy['orientation']=='landscape' and policy['menuOrientation']=='portrait'
+assert manifest['guideAppearance']['opacityRange']==[0,100]
+assert len(manifest['guideAppearance']['colors'])==7
+assert all(manifest['warnings'].get(key) for key in ['highlights','shadows'])
 catalog=json.loads((assets/manifest['content']['catalog']).read_text());layouts=json.loads((assets/manifest['content']['layouts']).read_text());preset=json.loads((assets/manifest['content']['preset']).read_text())
 assert catalog['schemaVersion']==layouts['schemaVersion']==preset['schemaVersion']==1
 layouts['layouts']={}

@@ -14,7 +14,7 @@ public final class GuideRenderer {
 
   public void draw(
       Canvas canvas, RectF frame, GuideCatalog.Selection s, int rotation, boolean miniature) {
-    if (s == null || !s.visible || frame.width() <= 0) return;
+    if (s == null || !s.visible || (!miniature && s.opacity == 0) || frame.width() <= 0) return;
     canvas.save();
     canvas.clipRect(frame);
     int q = ((rotation % 360) + 360) % 360;
@@ -37,14 +37,17 @@ public final class GuideRenderer {
       String type = a.optString("type"), style = a.optString("style");
       if (miniature && type.equals("text")) continue;
       p.setStyle(Paint.Style.STROKE);
-      p.setColor(0xfff5a36b);
-      p.setAlpha(style.equals("soft") ? 70 : miniature ? 190 : 205);
+      p.setColor(s.color);
+      p.setAlpha(
+          miniature
+              ? 190
+              : Math.round(255 * s.opacity / 100f * (style.equals("soft") ? .32f : 1f)));
       p.setStrokeWidth(Math.max(1, unit * (miniature ? .008f : .003f)));
       p.setPathEffect(
           style.equals("soft")
               ? new DashPathEffect(new float[] {unit * .012f, unit * .018f}, 0)
               : null);
-      p.setShadowLayer(miniature ? 0 : unit * .005f, 0, 1, 0xcc000000);
+      p.setShadowLayer(miniature ? 0 : unit * .005f, 0, 1, Math.round(90 * s.opacity / 100f) << 24);
       float x = (float) a.optDouble("x") * w, y = (float) a.optDouble("y") * h;
       if (type.equals("rect")) {
         float r = (float) a.optDouble("radius") * unit;
@@ -59,7 +62,7 @@ public final class GuideRenderer {
         canvas.drawOval(new RectF(x - rx, y - ry, x + rx, y + ry), p);
       } else if (type.equals("text")) {
         p.setStyle(Paint.Style.FILL);
-        p.setAlpha(220);
+        p.setAlpha(miniature ? 220 : Math.round(255 * s.opacity / 100f));
         p.setTextAlign(Paint.Align.CENTER);
         p.setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
         p.setTextSize(unit * .024f);

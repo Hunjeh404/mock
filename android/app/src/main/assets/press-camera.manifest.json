@@ -3,7 +3,7 @@
   "product": {
     "name": "보도사진 카메라",
     "applicationId": "com.hoonjay.presscamera",
-    "version": "1.0.0"
+    "version": "1.1.0"
   },
   "camera": {
     "defaultMode": "자동",
@@ -15,7 +15,9 @@
     "savePolicy": "RAW+JPG",
     "jpegQuality": 100,
     "editingEnabled": false,
-    "presetManagementEnabled": false
+    "presetManagementEnabled": false,
+    "orientation": "landscape",
+    "menuOrientation": "portrait"
   },
   "content": {
     "catalog": "press-guides/catalog.json",
@@ -27,5 +29,25 @@
     "contentGuide": "docs/CONTENT_GUIDE.md",
     "architecture": "docs/ARCHITECTURE.md",
     "handoff": "docs/AI_HANDOFF.md"
+  },
+  "warnings": {
+    "highlights": "밝은 곳이 제대로 촬영되지 않을 수 있어요.",
+    "shadows": "어두운 곳이 제대로 촬영되지 않을 수 있어요."
+  },
+  "guideAppearance": {
+    "defaultOpacity": 80,
+    "opacityRange": [
+      0,
+      100
+    ],
+    "colors": [
+      "테마색",
+      "흰색",
+      "검은색",
+      "빨간색",
+      "파란색",
+      "노란색",
+      "초록색"
+    ]
   }
 }

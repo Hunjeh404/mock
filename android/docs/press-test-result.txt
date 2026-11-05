@@ -1,2 +1,2 @@
 PASS: capture policy, 20 categories, 20 guides, keyword references, all person/prop/orientation variants, vector commands
-PASS: 19792 press ratio/detail/DNG integrity assertions
+PASS: 19825 press ratio/detail/DNG integrity assertions

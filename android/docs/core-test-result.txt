@@ -1,0 +1,1 @@
+PASS: 339183 assertions; RAW invariance, 16-bit PNG, CFA patterns, TIFF strips, crop/rotation, reference analysis, >4096px export, preview transforms/layout/gestures, matched tone/boost and studio/export.

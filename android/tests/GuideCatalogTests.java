@@ -20,6 +20,8 @@ public final class GuideCatalogTests {
     ok(s.people==4&&s.prop.equals("shared"),"Selection restore");ok(c.drawing(s,true).length()>0&&c.drawing(s,false).length()>0,"Landscape and portrait layout");
     GuideCatalog.Selection copy=s.copy();copy.categoryIds.add("event");copy.people=1;ok(s.people==4&&!s.categoryIds.contains("event"),"Draft copy cannot mutate accepted selection");
     s.guideId="unknown";s.people=999;s.categoryIds.add("not-found");c.normalize(s);ok(c.byId.containsKey(s.guideId)&&s.people!=999&&!s.categoryIds.contains("not-found"),"Stale preferences migrate safely");
+    s.opacity=0;s.color=com.hoonjay.filmroom.core.GuideAppearance.COLORS[2];GuideCatalog.Selection hidden=c.restore(s.json().toString());ok(hidden.opacity==0&&hidden.color==s.color,"Zero opacity and black survive persistence");
+    s.opacity=999;s.color=123;c.normalize(s);ok(s.opacity==100&&s.color==com.hoonjay.filmroom.core.GuideAppearance.COLORS[0],"Invalid appearance values normalized");
     System.out.println("PASS: "+checks+" native catalog/keyword/selection/layout checks");
   }
 }

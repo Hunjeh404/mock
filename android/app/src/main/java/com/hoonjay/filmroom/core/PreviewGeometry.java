@@ -27,6 +27,8 @@ public final class PreviewGeometry {
     return new int[] {left, top, left + fw, top + fh};
   }
 
+  public static int[] fitLandscape(int width,int height,double ratio){int fw=width,fh=(int)Math.round(fw/ratio);if(fh>height){fh=height;fw=(int)Math.round(fh*ratio);}int left=(width-fw)/2,top=(height-fh)/2;return new int[]{left,top,left+fw,top+fh};}
+
   /** 1 opens, -1 closes, 0 leaves film visibility unchanged. Distances are density-independent. */
   public static int filmSwipe(float dx, float dy) {
     if (Math.abs(dy) > 40 && Math.abs(dy) > Math.abs(dx) * 1.2f)

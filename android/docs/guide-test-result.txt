@@ -1,1 +1,1 @@
-PASS: 23 native catalog/keyword/selection/layout checks
+PASS: 25 native catalog/keyword/selection/layout checks

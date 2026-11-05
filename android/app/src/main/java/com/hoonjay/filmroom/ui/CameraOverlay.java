@@ -17,6 +17,8 @@ public final class CameraOverlay extends View {
 
     default void openGuides() {}
 
+    default void guideAppearance(String key) {}
+
     default void flashOptions() {}
 
     void gallery();
@@ -66,6 +68,9 @@ public final class CameraOverlay extends View {
   public CameraEngine.Lens active;
   public Recipe recipe = recipes.get(1);
   public OutputFormat outputFormat = OutputFormat.JPEG_MAX;
+  public boolean highlightRisk, shadowRisk;
+  public String highlightWarning = "밝은 곳이 제대로 촬영되지 않을 수 있어요.",
+      shadowWarning = "어두운 곳이 제대로 촬영되지 않을 수 있어요.";
   public GuideCatalog guideCatalog;
   public GuideCatalog.Selection guideSelection;
   public GuideRenderer guideRenderer;
@@ -296,8 +301,14 @@ public final class CameraOverlay extends View {
     if (w <= 0 || h <= 0) return;
     CameraLayout l = controls();
     hits.clear();
-    int[] bounds = PreviewGeometry.fit(w, h, ratio);
-    picture.set(bounds[0], bounds[1], bounds[2], bounds[3]);
+    int availableW = w - safeLeft - safeRight,
+        availableH = Math.max(1, (int) (l.bottomTop - l.topBottom - d(75)));
+    int[] bounds = PreviewGeometry.fitLandscape(availableW, availableH, ratio);
+    picture.set(
+        bounds[0] + safeLeft,
+        bounds[1] + (int) l.topBottom,
+        bounds[2] + safeLeft,
+        bounds[3] + (int) l.topBottom);
     if (!picture.equals(lastFrame)) {
       lastFrame = new Rect(picture);
       listener.frame(new Rect(picture));
@@ -308,7 +319,7 @@ public final class CameraOverlay extends View {
     c.drawRect(0, picture.top, picture.left, picture.bottom, p);
     c.drawRect(picture.right, picture.top, w, picture.bottom, p);
     if (guideRenderer != null && guideSelection != null)
-      guideRenderer.draw(c, new RectF(picture), guideSelection, deviceOrientation, false);
+      guideRenderer.draw(c, new RectF(picture), guideSelection, 0, false);
     if (grid) {
       color(0x88ffffff);
       p.setStrokeWidth(d(.5f));
@@ -364,8 +375,14 @@ public final class CameraOverlay extends View {
     text(c, mode, l.mode.cx(), l.mode.cy() + d(3), 9, ACCENT, true);
     hit("mode", l.mode);
     round(c, rect(l.format), 0xff211f21, 5);
-    text(c, "RAW+JPG", l.format.cx(), l.format.cy() + d(3), 9, TEXT, true);
-    text(c, "3:2", l.ratio.cx(), l.ratio.cy() + d(3), 9, MUTED, true);
+    int opacity = guideSelection == null ? 80 : guideSelection.opacity;
+    text(c, "투명도 " + opacity + "%", l.format.cx(), l.format.cy() + d(3), 9, TEXT, true);
+    hit("opacity", l.format);
+    round(c, rect(l.ratio), 0xff211f21, 5);
+    color(guideSelection == null ? ACCENT : guideSelection.color);
+    c.drawCircle(l.ratio.cx() - d(9), l.ratio.cy(), d(4), p);
+    text(c, "색 ▾", l.ratio.cx() + d(4), l.ratio.cy() + d(3), 8, TEXT, true);
+    hit("guideColor", l.ratio);
     RectF guideButton = new RectF(l.preset.left, l.preset.top, l.manage.right, l.preset.bottom);
     round(c, guideButton, 0xff30251f, 5);
     String guideName =
@@ -393,7 +410,7 @@ public final class CameraOverlay extends View {
       String tip =
           guideCatalog != null && guideSelection != null
               ? guideCatalog.guide(guideSelection.guideId).optString("tip")
-              : "자동 촬영 · 보도 클린";
+              : "";
       if (tip.length() > 35) tip = tip.substring(0, 34) + "…";
       text(c, tip, l.manual.cx(), l.manual.cy() + d(3), 8, MUTED, true);
     }
@@ -447,7 +464,8 @@ public final class CameraOverlay extends View {
     tool(c, "meter", l.meter, meterOn, "노출");
     tool(c, "level", l.level, level, "수평");
     tool(c, "grid", l.grid, grid, "격자");
-    drawFrameLabel(c, l);
+    drawClippingWarning(c, l);
+
     if (tracking) drawTracking(c, l);
     else if (locked || lockPending) drawLockHint(c, l);
     if (!error.isEmpty()) {
@@ -557,32 +575,21 @@ public final class CameraOverlay extends View {
     c.restore();
   }
 
-  private void drawFrameLabel(Canvas c, CameraLayout l) {
-    RectF visible =
-        new RectF(
-            Math.max(picture.left, safeLeft),
-            Math.max(picture.top, l.topBottom),
-            Math.min(picture.right, getWidth() - safeRight),
-            Math.min(picture.bottom, l.bottomTop));
-    if (visible.width() <= d(25) || visible.height() <= d(25)) return;
-    FrameLabel at =
-        FrameLabel.of(
-            visible.left, visible.top, visible.right, visible.bottom, deviceOrientation, d(12));
-    c.save();
-    c.clipRect(visible);
-    c.rotate(at.rotation, at.x, at.y);
-    color(0xffffffff);
-    p.setTextAlign(Paint.Align.CENTER);
-    p.setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
-    p.setTextSize(d(9));
-    p.setShadowLayer(d(2), 0, d(1), 0xee000000);
-    c.drawText(
-        mode + " · " + (outputFormat == OutputFormat.RAW_ONLY ? "RAW" : recipe.name),
-        at.x,
-        at.y + d(3),
-        p);
-    p.clearShadowLayer();
-    c.restore();
+  private void drawClippingWarning(Canvas c, CameraLayout l) {
+    if (!highlightRisk && !shadowRisk) return;
+    int count = (highlightRisk ? 1 : 0) + (shadowRisk ? 1 : 0);
+    float height = d(30 * count),
+        left = picture.left + d(5),
+        right = picture.right - d(5),
+        top = Math.min(picture.bottom + d(7), l.bottomTop - height - d(4));
+    RectF box = new RectF(left, top, right, top + height);
+    round(c, box, 0xff000000, 5);
+    float y = top + d(19);
+    if (highlightRisk) {
+      text(c, highlightWarning, (left + right) / 2, y, 10, ACCENT, true);
+      y += d(30);
+    }
+    if (shadowRisk) text(c, shadowWarning, (left + right) / 2, y, 10, ACCENT, true);
   }
 
   public int selectedLens() {
@@ -812,6 +819,8 @@ public final class CameraOverlay extends View {
     if (target.equals("shutter")) listener.shutter();
     else if (target.equals("gallery")) listener.gallery();
     else if (target.equals("mode")) listener.openModePicker();
+    else if (target.equals("opacity")) listener.guideAppearance("opacity");
+    else if (target.equals("guideColor")) listener.guideAppearance("color");
     else if (target.equals("guide")) listener.openGuides();
     else if (target.equals("manage")) listener.managePresets();
     else if (target.equals("timer")) listener.dial("timer", 1);

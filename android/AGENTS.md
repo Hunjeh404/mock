@@ -8,7 +8,10 @@
 
 - 기본 모드는 자동, 허용 모드는 자동/프로 두 개이다.
 - 자동에서는 ISO·셔터·EV·초점 다이얼을 렌더링하거나 터치 대상으로 등록하지 않는다. 프로에서는 네 다이얼을 모두 표시한다. 조리개/ND는 실제 렌즈 기능에 따른다.
-- 저장은 RAW(DNG)+JPG, JPG 품질 100, 비율 3:2(세로 2:3) 고정이다. JPG만 저장하는 대체 경로를 조용히 추가하지 않는다.
+- 저장은 RAW(DNG)+JPG, JPG 품질 100, 항상 가로 3:2 고정(메뉴는 세로)이다. JPG만 저장하는 대체 경로를 조용히 추가하지 않는다.
+- 가이드 투명도는 0~100, 지정한 7개 색상을 보존한다. 0은 완전히 숨김이며 앱 재실행 후에도 유지한다.
+- 명부/암부 빨간 빗금과 경고는 화면 전용이며 측광/추적/파일 저장에 합성하지 않는다. 경고는 센서 손실 단정이 아닌 촬영 신호 기반 위험 안내다.
+- 삭제는 RAW/JPG 한 쌍과 앱 기록을 함께 처리한다. 저장 중인 사진은 삭제하지 않고, 실패한 작업을 성공으로 보고하지 않는다.
 - 프리셋은 `press-clean` 하나만 자동 적용한다. 편집실, 프리셋 관리, 인물, 불꽃놀이, 별사진 모드를 복원하지 않는다.
 - 구도 가이드는 화면 위에만 그린다. 원본 RAW나 JPG 픽셀에 가이드/문자를 합성하지 않는다.
 - RAW 센서 샘플, 색상 보정, 노출, 타임스탬프 대응을 보존한다. 크롭은 DNG 기본 크롭 메타데이터로 처리한다.
@@ -20,7 +23,7 @@
 - 이름·팁·키워드는 데이터에서 수정한다. 추천은 분류와 사진의 다대다 관계이며 `primary`와 `extra`를 구분한다.
 - ID는 저장된 사용자 선택에 사용된다. 이름을 바꾸기 위해 ID를 바꾸지 않는다. 제거/ID 변경 시 `GuideCatalog.restore/normalize`의 이전 선택 마이그레이션을 검토한다.
 - 새로운 사진 형태는 catalog + layouts index + 해당 도형 파일에 추가한다. 기존 도형 타입(rect/ellipse/path/text)으로 표현하면 Java 수정 없이 추가할 수 있다.
-- `peopleOptions`의 모든 인원, 소품 변형, portrait/landscape 도형이 있어야 한다.
+- `peopleOptions`의 모든 인원·소품 변형과 도형이 있어야 한다. 촬영 화면은 landscape 도형만 사용하며 기존 portrait 도형은 호환 자료로 유지한다.
 - 호환되는 콘텐츠 변경 시 `catalogVersion`을 올린다. 데이터 구조가 호환되지 않으면 schemaVersion과 로더를 함께 변경한다.
 - 도형은 0~1 정규 좌표다. 색상·선 스타일은 `GuideRenderer`에서 앱 공통 테마를 따른다.
 
@@ -36,6 +39,7 @@
 
 - 데이터/문구: `python3 scripts/validate-guides.py`, `bash scripts/test-guides.sh`
 - 저장·RAW·비율·디테일: `bash scripts/test-press.sh`, `bash scripts/test-core.sh`
+- 삭제/미디어 기록: `PRESS_JSON_TEST_JAR=... bash scripts/test-storage.sh`
 - 초점 흐름: `bash scripts/test-capture-focus.sh`
 - 프리셋/미리보기: `bash scripts/test-shader.sh`
 - APK: `ANDROID_SDK_ROOT=... bash scripts/build-apk.sh`
