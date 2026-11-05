@@ -1,0 +1,928 @@
+{
+  "schemaVersion": 1,
+  "catalogVersion": "1.0.0",
+  "locale": "ko-KR",
+  "categories": [
+    {
+      "id": "product-launch",
+      "group": "출시·기술",
+      "name": "제품 출시",
+      "keywords": [
+        "신제품",
+        "출시",
+        "단말",
+        "기기",
+        "디바이스",
+        "스마트폰",
+        "공개"
+      ],
+      "primary": [
+        "product",
+        "model-product",
+        "demo"
+      ],
+      "extra": [
+        "booth"
+      ]
+    },
+    {
+      "id": "service-launch",
+      "group": "출시·기술",
+      "name": "서비스·요금제·혜택 출시",
+      "keywords": [
+        "서비스",
+        "요금제",
+        "혜택",
+        "프로모션",
+        "구독",
+        "출시",
+        "AI",
+        "인공지능",
+        "앱"
+      ],
+      "primary": [
+        "model-product",
+        "demo",
+        "interaction"
+      ],
+      "extra": [
+        "booth"
+      ]
+    },
+    {
+      "id": "research",
+      "group": "출시·기술",
+      "name": "기술 개발·연구 성과",
+      "keywords": [
+        "기술",
+        "개발",
+        "연구",
+        "성과",
+        "성공",
+        "AI",
+        "인공지능",
+        "로봇",
+        "특허"
+      ],
+      "primary": [
+        "activity",
+        "demo",
+        "product"
+      ],
+      "extra": [
+        "interior",
+        "small-group"
+      ]
+    },
+    {
+      "id": "pilot",
+      "group": "출시·기술",
+      "name": "실증·시범 운영",
+      "keywords": [
+        "실증",
+        "시범",
+        "테스트",
+        "운영",
+        "검증",
+        "자율주행",
+        "AI",
+        "인공지능"
+      ],
+      "primary": [
+        "demo",
+        "activity"
+      ],
+      "extra": [
+        "interior",
+        "exterior",
+        "small-group"
+      ]
+    },
+    {
+      "id": "agreement",
+      "group": "협력·시설",
+      "name": "협약·계약·제휴",
+      "keywords": [
+        "업무협약",
+        "MOU",
+        "협약",
+        "계약",
+        "제휴",
+        "체결",
+        "파트너십",
+        "공동",
+        "협력",
+        "공급계약"
+      ],
+      "primary": [
+        "held-prop",
+        "handshake",
+        "signing",
+        "small-group"
+      ],
+      "extra": [
+        "demo",
+        "interior",
+        "interaction"
+      ]
+    },
+    {
+      "id": "opening",
+      "group": "협력·시설",
+      "name": "개소·개관·준공",
+      "keywords": [
+        "개소",
+        "개관",
+        "준공",
+        "개장",
+        "오픈",
+        "센터",
+        "연구소",
+        "완공"
+      ],
+      "primary": [
+        "exterior",
+        "interior",
+        "ribbon",
+        "unveil",
+        "small-group"
+      ],
+      "extra": [
+        "product",
+        "demo"
+      ]
+    },
+    {
+      "id": "investment",
+      "group": "협력·시설",
+      "name": "투자·착공·사업 추진",
+      "keywords": [
+        "투자",
+        "착공",
+        "사업",
+        "추진",
+        "건립",
+        "공장",
+        "부지",
+        "인프라"
+      ],
+      "primary": [
+        "shovel",
+        "exterior",
+        "speaker",
+        "small-group"
+      ],
+      "extra": [
+        "signing",
+        "handshake",
+        "activity"
+      ]
+    },
+    {
+      "id": "event",
+      "group": "행사·성과",
+      "name": "행사 개최·참가",
+      "keywords": [
+        "행사",
+        "전시",
+        "박람회",
+        "콘퍼런스",
+        "컨퍼런스",
+        "간담회",
+        "설명회",
+        "포럼",
+        "세미나",
+        "MWC",
+        "CES",
+        "대회"
+      ],
+      "primary": [
+        "audience",
+        "speaker",
+        "booth",
+        "large-group"
+      ],
+      "extra": [
+        "demo",
+        "interaction",
+        "handover"
+      ]
+    },
+    {
+      "id": "award",
+      "group": "행사·성과",
+      "name": "수상·인증·선정",
+      "keywords": [
+        "수상",
+        "인증",
+        "선정",
+        "인증서",
+        "상패",
+        "평가",
+        "우수",
+        "시상"
+      ],
+      "primary": [
+        "held-prop",
+        "handover",
+        "small-group"
+      ],
+      "extra": [
+        "product",
+        "activity",
+        "audience"
+      ]
+    },
+    {
+      "id": "milestone",
+      "group": "행사·성과",
+      "name": "판매·가입자·사업 성과",
+      "keywords": [
+        "판매",
+        "가입자",
+        "달성",
+        "기록",
+        "돌파",
+        "실적",
+        "성과",
+        "백만",
+        "천만"
+      ],
+      "primary": [
+        "model-product",
+        "demo",
+        "held-prop"
+      ],
+      "extra": [
+        "activity",
+        "small-group"
+      ]
+    },
+    {
+      "id": "anniversary",
+      "group": "행사·성과",
+      "name": "창립·사업 주년 기념",
+      "keywords": [
+        "창립",
+        "주년",
+        "기념",
+        "생일",
+        "역사"
+      ],
+      "primary": [
+        "large-group",
+        "held-prop",
+        "audience"
+      ],
+      "extra": [
+        "exterior",
+        "interaction",
+        "activity"
+      ]
+    },
+    {
+      "id": "donation",
+      "group": "사회공헌",
+      "name": "기부·후원·전달",
+      "keywords": [
+        "기부",
+        "후원",
+        "성금",
+        "물품",
+        "장학금",
+        "전달",
+        "지원",
+        "전달식"
+      ],
+      "primary": [
+        "held-prop",
+        "handover",
+        "small-group"
+      ],
+      "extra": [
+        "activity",
+        "interaction"
+      ]
+    },
+    {
+      "id": "volunteer",
+      "group": "사회공헌",
+      "name": "봉사·사회공헌·캠페인",
+      "keywords": [
+        "봉사",
+        "사회공헌",
+        "캠페인",
+        "환경정화",
+        "교육",
+        "지원",
+        "취약계층",
+        "나눔"
+      ],
+      "primary": [
+        "activity",
+        "interaction",
+        "large-group"
+      ],
+      "extra": [
+        "handover",
+        "exterior"
+      ]
+    },
+    {
+      "id": "customer",
+      "group": "고객·조직",
+      "name": "고객 도입·구축 사례",
+      "keywords": [
+        "고객",
+        "도입",
+        "구축",
+        "적용",
+        "사례",
+        "공급",
+        "B2B",
+        "고객사"
+      ],
+      "primary": [
+        "demo",
+        "interior",
+        "activity"
+      ],
+      "extra": [
+        "interaction",
+        "small-group",
+        "product"
+      ]
+    },
+    {
+      "id": "personnel",
+      "group": "고객·조직",
+      "name": "인사·취임",
+      "keywords": [
+        "인사",
+        "취임",
+        "대표",
+        "CEO",
+        "임원",
+        "사장",
+        "선임",
+        "임명"
+      ],
+      "primary": [
+        "portrait",
+        "speaker",
+        "handover"
+      ],
+      "extra": [
+        "audience",
+        "interaction"
+      ]
+    },
+    {
+      "id": "organization",
+      "group": "고객·조직",
+      "name": "조직·법인·추진단 출범",
+      "keywords": [
+        "조직",
+        "법인",
+        "추진단",
+        "출범",
+        "구성",
+        "신설",
+        "출범식"
+      ],
+      "primary": [
+        "large-group",
+        "small-group",
+        "speaker",
+        "unveil"
+      ],
+      "extra": [
+        "interior",
+        "activity",
+        "portrait"
+      ]
+    },
+    {
+      "id": "policy",
+      "group": "기타 발표",
+      "name": "정책·제도·운영 변경",
+      "keywords": [
+        "정책",
+        "제도",
+        "운영",
+        "변경",
+        "개편",
+        "약관"
+      ],
+      "primary": [
+        "demo",
+        "interaction",
+        "activity"
+      ],
+      "extra": [
+        "speaker"
+      ]
+    },
+    {
+      "id": "report",
+      "group": "기타 발표",
+      "name": "조사·통계·보고서 발표",
+      "keywords": [
+        "조사",
+        "통계",
+        "보고서",
+        "전망",
+        "설문",
+        "분석",
+        "백서"
+      ],
+      "primary": [
+        "speaker",
+        "activity"
+      ],
+      "extra": [
+        "portrait"
+      ]
+    },
+    {
+      "id": "finance",
+      "group": "기타 발표",
+      "name": "경영 실적·재무·주주 안내",
+      "keywords": [
+        "경영",
+        "재무",
+        "주주",
+        "배당",
+        "자사주",
+        "매출",
+        "영업이익",
+        "실적"
+      ],
+      "primary": [
+        "speaker",
+        "exterior",
+        "activity"
+      ],
+      "extra": [
+        "portrait"
+      ]
+    },
+    {
+      "id": "response",
+      "group": "기타 발표",
+      "name": "입장·해명·사고 대응",
+      "keywords": [
+        "입장",
+        "해명",
+        "사고",
+        "대응",
+        "장애",
+        "복구",
+        "점검",
+        "재발방지"
+      ],
+      "primary": [
+        "speaker",
+        "activity"
+      ],
+      "extra": [
+        "exterior",
+        "interior"
+      ]
+    }
+  ],
+  "guides": [
+    {
+      "id": "portrait",
+      "name": "인물 프로필",
+      "keywords": [
+        "대표",
+        "임원",
+        "취임",
+        "인사",
+        "프로필",
+        "얼굴",
+        "상반신"
+      ],
+      "tip": "눈높이를 맞추고 머리 위와 어깨 양옆에 여백을 남겨요.",
+      "layoutId": "portrait",
+      "peopleOptions": [
+        1
+      ],
+      "defaultPeople": 1,
+      "preferredOrientation": "portrait"
+    },
+    {
+      "id": "small-group",
+      "name": "소수 인원 기념촬영",
+      "keywords": [
+        "기념",
+        "관계자",
+        "방문",
+        "출범",
+        "나란히",
+        "단체"
+      ],
+      "tip": "중앙을 맞추고 사람 사이 간격을 일정하게 배치해요.",
+      "layoutId": "small-group",
+      "peopleOptions": [
+        2,
+        3,
+        4,
+        6
+      ],
+      "defaultPeople": 2,
+      "preferredOrientation": "landscape"
+    },
+    {
+      "id": "large-group",
+      "name": "다수 인원 단체사진",
+      "keywords": [
+        "단체",
+        "임직원",
+        "구성원",
+        "봉사",
+        "행사",
+        "전체"
+      ],
+      "tip": "앞뒤 줄의 얼굴이 겹치지 않게 서고 양끝 여백을 확보해요.",
+      "layoutId": "large-group",
+      "peopleOptions": [
+        6,
+        8,
+        12
+      ],
+      "defaultPeople": 8,
+      "preferredOrientation": "landscape"
+    },
+    {
+      "id": "held-prop",
+      "name": "문서·전달판·상패 들기",
+      "keywords": [
+        "협약서",
+        "인증서",
+        "상패",
+        "전달판",
+        "기부",
+        "기념촬영",
+        "문서",
+        "MOU",
+        "업무협약"
+      ],
+      "tip": "소품을 가슴 아래에 두고 글자가 손에 가리지 않게 해요.",
+      "layoutId": "held-prop",
+      "peopleOptions": [
+        1,
+        2,
+        3,
+        4,
+        6
+      ],
+      "defaultPeople": 2,
+      "preferredOrientation": "landscape"
+    },
+    {
+      "id": "handshake",
+      "name": "악수",
+      "keywords": [
+        "협약",
+        "계약",
+        "제휴",
+        "악수",
+        "파트너십",
+        "체결"
+      ],
+      "tip": "두 사람의 얼굴과 맞잡은 손을 함께 담아요.",
+      "layoutId": "handshake",
+      "peopleOptions": [
+        2
+      ],
+      "defaultPeople": 2,
+      "preferredOrientation": "landscape"
+    },
+    {
+      "id": "signing",
+      "name": "서명",
+      "keywords": [
+        "계약",
+        "서명",
+        "협약",
+        "체결",
+        "사인"
+      ],
+      "tip": "얼굴과 문서, 펜을 든 손이 모두 보이게 잡아요.",
+      "layoutId": "signing",
+      "peopleOptions": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "defaultPeople": 2,
+      "preferredOrientation": "landscape"
+    },
+    {
+      "id": "handover",
+      "name": "수여·전달",
+      "keywords": [
+        "수여",
+        "전달",
+        "수상",
+        "기부",
+        "후원",
+        "임명",
+        "장학금"
+      ],
+      "tip": "전달물을 중앙에 두고 양쪽 손과 표정이 보이게 해요.",
+      "layoutId": "handover",
+      "peopleOptions": [
+        2
+      ],
+      "defaultPeople": 2,
+      "preferredOrientation": "landscape"
+    },
+    {
+      "id": "ribbon",
+      "name": "테이프 커팅",
+      "keywords": [
+        "개소",
+        "개관",
+        "준공",
+        "개장",
+        "오픈",
+        "테이프",
+        "가위"
+      ],
+      "tip": "테이프와 가위를 같은 높이에 두고 전신을 담아요.",
+      "layoutId": "ribbon",
+      "peopleOptions": [
+        3,
+        4,
+        6,
+        8
+      ],
+      "defaultPeople": 6,
+      "preferredOrientation": "landscape"
+    },
+    {
+      "id": "unveil",
+      "name": "현판·기념물 제막",
+      "keywords": [
+        "현판",
+        "제막",
+        "개소",
+        "출범",
+        "기념물"
+      ],
+      "tip": "현판의 글자가 드러나도록 양옆에 서요.",
+      "layoutId": "unveil",
+      "peopleOptions": [
+        2,
+        4,
+        6
+      ],
+      "defaultPeople": 2,
+      "preferredOrientation": "landscape"
+    },
+    {
+      "id": "shovel",
+      "name": "시삽",
+      "keywords": [
+        "착공",
+        "시삽",
+        "건립",
+        "삽",
+        "투자"
+      ],
+      "tip": "삽과 흙, 참여자의 전신이 잘리지 않게 담아요.",
+      "layoutId": "shovel",
+      "peopleOptions": [
+        3,
+        4,
+        6,
+        8
+      ],
+      "defaultPeople": 4,
+      "preferredOrientation": "landscape"
+    },
+    {
+      "id": "product",
+      "name": "제품 단독",
+      "keywords": [
+        "제품",
+        "신제품",
+        "단말",
+        "기기",
+        "디바이스",
+        "장비",
+        "상패",
+        "결과물"
+      ],
+      "tip": "제품의 수직·수평을 맞추고 가장자리 여백을 확보해요.",
+      "layoutId": "product",
+      "peopleOptions": [
+        0
+      ],
+      "defaultPeople": 0,
+      "preferredOrientation": "landscape"
+    },
+    {
+      "id": "model-product",
+      "name": "모델이 제품·서비스 소개",
+      "keywords": [
+        "출시",
+        "모델",
+        "소개",
+        "요금제",
+        "혜택",
+        "프로모션",
+        "스마트폰"
+      ],
+      "tip": "얼굴과 제품이 경쟁하지 않도록 좌우로 나눠 배치해요.",
+      "layoutId": "model-product",
+      "peopleOptions": [
+        1,
+        2
+      ],
+      "defaultPeople": 1,
+      "preferredOrientation": "landscape"
+    },
+    {
+      "id": "demo",
+      "name": "사용·시연",
+      "keywords": [
+        "시연",
+        "사용",
+        "체험",
+        "이용",
+        "서비스",
+        "기술",
+        "실증",
+        "AI",
+        "인공지능",
+        "화면"
+      ],
+      "tip": "손동작과 화면이 함께 보이는 방향에서 촬영해요.",
+      "layoutId": "demo",
+      "peopleOptions": [
+        1,
+        2,
+        3
+      ],
+      "defaultPeople": 2,
+      "preferredOrientation": "landscape"
+    },
+    {
+      "id": "speaker",
+      "name": "발표자·연설자",
+      "keywords": [
+        "발표",
+        "연설",
+        "취임사",
+        "브리핑",
+        "콘퍼런스",
+        "세미나",
+        "기자간담회"
+      ],
+      "tip": "발표자와 행사명을 함께 담고 마이크가 얼굴을 가리지 않게 해요.",
+      "layoutId": "speaker",
+      "peopleOptions": [
+        1
+      ],
+      "defaultPeople": 1,
+      "preferredOrientation": "landscape"
+    },
+    {
+      "id": "audience",
+      "name": "무대·객석 전경",
+      "keywords": [
+        "객석",
+        "무대",
+        "포럼",
+        "행사",
+        "콘퍼런스",
+        "세미나",
+        "설명회"
+      ],
+      "tip": "무대를 수평으로 맞추고 객석과 행사명이 함께 보이게 해요.",
+      "layoutId": "audience",
+      "peopleOptions": [
+        0
+      ],
+      "defaultPeople": 0,
+      "preferredOrientation": "landscape"
+    },
+    {
+      "id": "booth",
+      "name": "전시 부스·상담",
+      "keywords": [
+        "부스",
+        "전시",
+        "박람회",
+        "MWC",
+        "CES",
+        "상담",
+        "전시회"
+      ],
+      "tip": "부스명과 시연물, 설명자와 관람객을 함께 담아요.",
+      "layoutId": "booth",
+      "peopleOptions": [
+        2,
+        3,
+        4
+      ],
+      "defaultPeople": 2,
+      "preferredOrientation": "landscape"
+    },
+    {
+      "id": "exterior",
+      "name": "건물·시설 외관",
+      "keywords": [
+        "건물",
+        "외관",
+        "사옥",
+        "시설",
+        "공장",
+        "부지",
+        "매장",
+        "준공"
+      ],
+      "tip": "건물 수직선을 맞추고 간판과 건물 끝이 잘리지 않게 해요.",
+      "layoutId": "exterior",
+      "peopleOptions": [
+        0
+      ],
+      "defaultPeople": 0,
+      "preferredOrientation": "landscape"
+    },
+    {
+      "id": "interior",
+      "name": "시설·공간 내부",
+      "keywords": [
+        "내부",
+        "공간",
+        "센터",
+        "연구소",
+        "관제실",
+        "설비",
+        "매장",
+        "시설"
+      ],
+      "tip": "수평·수직을 맞추고 주요 설비와 공간의 깊이를 보여줘요.",
+      "layoutId": "interior",
+      "peopleOptions": [
+        0
+      ],
+      "defaultPeople": 0,
+      "preferredOrientation": "landscape"
+    },
+    {
+      "id": "activity",
+      "name": "작업·연구·봉사 활동",
+      "keywords": [
+        "연구",
+        "실험",
+        "개발",
+        "봉사",
+        "포장",
+        "환경정화",
+        "작업",
+        "점검",
+        "복구"
+      ],
+      "tip": "사람의 얼굴뿐 아니라 손과 작업 대상을 함께 담아요.",
+      "layoutId": "activity",
+      "peopleOptions": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "defaultPeople": 2,
+      "preferredOrientation": "landscape"
+    },
+    {
+      "id": "interaction",
+      "name": "상담·교육·교류",
+      "keywords": [
+        "교육",
+        "상담",
+        "교류",
+        "고객",
+        "지원",
+        "수혜자",
+        "봉사",
+        "수업"
+      ],
+      "tip": "두 사람의 시선과 함께 보는 자료가 자연스럽게 이어지게 해요.",
+      "layoutId": "interaction",
+      "peopleOptions": [
+        2,
+        3,
+        4
+      ],
+      "defaultPeople": 2,
+      "preferredOrientation": "landscape"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "press-clean",
+  "name": "보도 클린",
+  "english": "PRESS CLEAN",
+  "strength": 1,
+  "exposure": 0,
+  "contrast": 1.015,
+  "saturation": 1.02,
+  "highlights": -0.08,
+  "shadows": 0.04,
+  "noiseLuma": 0.025,
+  "noiseChroma": 0.14,
+  "detail": 0.16,
+  "grain": 0,
+  "bloom": 0,
+  "vignette": 0,
+  "skinTexture": 0,
+  "balance": [1, 1, 1],
+  "shadowColor": [0, 0, 0]
+}

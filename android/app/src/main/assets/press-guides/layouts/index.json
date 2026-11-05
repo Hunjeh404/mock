@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "coordinateSpace": "normalized-0-to-1",
+  "layoutFiles": {
+    "portrait": "press-guides/layouts/portrait.json",
+    "small-group": "press-guides/layouts/small-group.json",
+    "large-group": "press-guides/layouts/large-group.json",
+    "held-prop": "press-guides/layouts/held-prop.json",
+    "handshake": "press-guides/layouts/handshake.json",
+    "signing": "press-guides/layouts/signing.json",
+    "handover": "press-guides/layouts/handover.json",
+    "ribbon": "press-guides/layouts/ribbon.json",
+    "unveil": "press-guides/layouts/unveil.json",
+    "shovel": "press-guides/layouts/shovel.json",
+    "product": "press-guides/layouts/product.json",
+    "model-product": "press-guides/layouts/model-product.json",
+    "demo": "press-guides/layouts/demo.json",
+    "speaker": "press-guides/layouts/speaker.json",
+    "audience": "press-guides/layouts/audience.json",
+    "booth": "press-guides/layouts/booth.json",
+    "exterior": "press-guides/layouts/exterior.json",
+    "interior": "press-guides/layouts/interior.json",
+    "activity": "press-guides/layouts/activity.json",
+    "interaction": "press-guides/layouts/interaction.json"
+  }
+}

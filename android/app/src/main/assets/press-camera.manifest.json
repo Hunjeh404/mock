@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "product": {
+    "name": "보도사진 카메라",
+    "applicationId": "com.hoonjay.presscamera",
+    "version": "1.0.0"
+  },
+  "camera": {
+    "defaultMode": "자동",
+    "modes": [
+      "자동",
+      "프로"
+    ],
+    "ratio": 1.5,
+    "savePolicy": "RAW+JPG",
+    "jpegQuality": 100,
+    "editingEnabled": false,
+    "presetManagementEnabled": false
+  },
+  "content": {
+    "catalog": "press-guides/catalog.json",
+    "layouts": "press-guides/layouts/index.json",
+    "preset": "press-guides/press-clean.json"
+  },
+  "maintenance": {
+    "instructions": "AGENTS.md",
+    "contentGuide": "docs/CONTENT_GUIDE.md",
+    "architecture": "docs/ARCHITECTURE.md",
+    "handoff": "docs/AI_HANDOFF.md"
+  }
+}

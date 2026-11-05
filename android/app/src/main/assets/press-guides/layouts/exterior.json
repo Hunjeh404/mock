@@ -1,0 +1,460 @@
+{
+  "schemaVersion": 1,
+  "layoutId": "exterior",
+  "variants": {
+    "0:individual": {
+      "landscape": [
+        {
+          "style": "soft",
+          "type": "path",
+          "commands": [
+            [
+              "M",
+              0.055833,
+              0.191268
+            ],
+            [
+              "L",
+              0.944167,
+              0.191268
+            ]
+          ]
+        },
+        {
+          "style": "guide",
+          "type": "rect",
+          "x": 0.255952,
+          "y": 0.252768,
+          "width": 0.488095,
+          "height": 0.527143,
+          "radius": 0.002929
+        },
+        {
+          "style": "guide",
+          "type": "rect",
+          "x": 0.373095,
+          "y": 0.296696,
+          "width": 0.25381,
+          "height": 0.080536,
+          "radius": 0.011714
+        },
+        {
+          "style": "label",
+          "type": "text",
+          "x": 0.5,
+          "y": 0.349411,
+          "text": "간판"
+        },
+        {
+          "style": "guide",
+          "type": "rect",
+          "x": 0.285238,
+          "y": 0.421161,
+          "width": 0.058571,
+          "height": 0.058571,
+          "radius": 0.001464
+        },
+        {
+          "style": "guide",
+          "type": "rect",
+          "x": 0.375048,
+          "y": 0.421161,
+          "width": 0.058571,
+          "height": 0.058571,
+          "radius": 0.001464
+        },
+        {
+          "style": "guide",
+          "type": "rect",
+          "x": 0.464857,
+          "y": 0.421161,
+          "width": 0.058571,
+          "height": 0.058571,
+          "radius": 0.001464
+        },
+        {
+          "style": "guide",
+          "type": "rect",
+          "x": 0.554667,
+          "y": 0.421161,
+          "width": 0.058571,
+          "height": 0.058571,
+          "radius": 0.001464
+        },
+        {
+          "style": "guide",
+          "type": "rect",
+          "x": 0.644476,
+          "y": 0.421161,
+          "width": 0.058571,
+          "height": 0.058571,
+          "radius": 0.001464
+        },
+        {
+          "style": "guide",
+          "type": "rect",
+          "x": 0.285238,
+          "y": 0.523661,
+          "width": 0.058571,
+          "height": 0.058571,
+          "radius": 0.001464
+        },
+        {
+          "style": "guide",
+          "type": "rect",
+          "x": 0.375048,
+          "y": 0.523661,
+          "width": 0.058571,
+          "height": 0.058571,
+          "radius": 0.001464
+        },
+        {
+          "style": "guide",
+          "type": "rect",
+          "x": 0.464857,
+          "y": 0.523661,
+          "width": 0.058571,
+          "height": 0.058571,
+          "radius": 0.001464
+        },
+        {
+          "style": "guide",
+          "type": "rect",
+          "x": 0.554667,
+          "y": 0.523661,
+          "width": 0.058571,
+          "height": 0.058571,
+          "radius": 0.001464
+        },
+        {
+          "style": "guide",
+          "type": "rect",
+          "x": 0.644476,
+          "y": 0.523661,
+          "width": 0.058571,
+          "height": 0.058571,
+          "radius": 0.001464
+        },
+        {
+          "style": "guide",
+          "type": "rect",
+          "x": 0.285238,
+          "y": 0.626161,
+          "width": 0.058571,
+          "height": 0.058571,
+          "radius": 0.001464
+        },
+        {
+          "style": "guide",
+          "type": "rect",
+          "x": 0.375048,
+          "y": 0.626161,
+          "width": 0.058571,
+          "height": 0.058571,
+          "radius": 0.001464
+        },
+        {
+          "style": "guide",
+          "type": "rect",
+          "x": 0.464857,
+          "y": 0.626161,
+          "width": 0.058571,
+          "height": 0.058571,
+          "radius": 0.001464
+        },
+        {
+          "style": "guide",
+          "type": "rect",
+          "x": 0.554667,
+          "y": 0.626161,
+          "width": 0.058571,
+          "height": 0.058571,
+          "radius": 0.001464
+        },
+        {
+          "style": "guide",
+          "type": "rect",
+          "x": 0.644476,
+          "y": 0.626161,
+          "width": 0.058571,
+          "height": 0.058571,
+          "radius": 0.001464
+        },
+        {
+          "style": "guide",
+          "type": "path",
+          "commands": [
+            [
+              "M",
+              0.09,
+              0.787232
+            ],
+            [
+              "L",
+              0.91,
+              0.787232
+            ]
+          ]
+        },
+        {
+          "style": "soft",
+          "type": "path",
+          "commands": [
+            [
+              "M",
+              0.255952,
+              0.194196
+            ],
+            [
+              "L",
+              0.255952,
+              0.838482
+            ]
+          ]
+        },
+        {
+          "style": "soft",
+          "type": "path",
+          "commands": [
+            [
+              "M",
+              0.744048,
+              0.194196
+            ],
+            [
+              "L",
+              0.744048,
+              0.838482
+            ]
+          ]
+        }
+      ],
+      "portrait": [
+        {
+          "style": "soft",
+          "type": "path",
+          "commands": [
+            [
+              "M",
+              0.055833,
+              0.373897
+            ],
+            [
+              "L",
+              0.944167,
+              0.373897
+            ]
+          ]
+        },
+        {
+          "style": "guide",
+          "type": "rect",
+          "x": 0.255952,
+          "y": 0.40123,
+          "width": 0.488095,
+          "height": 0.234286,
+          "radius": 0.001952
+        },
+        {
+          "style": "guide",
+          "type": "rect",
+          "x": 0.373095,
+          "y": 0.420754,
+          "width": 0.25381,
+          "height": 0.035794,
+          "radius": 0.00781
+        },
+        {
+          "style": "label",
+          "type": "text",
+          "x": 0.5,
+          "y": 0.444183,
+          "text": "간판"
+        },
+        {
+          "style": "guide",
+          "type": "rect",
+          "x": 0.285238,
+          "y": 0.476071,
+          "width": 0.058571,
+          "height": 0.026032,
+          "radius": 0.000976
+        },
+        {
+          "style": "guide",
+          "type": "rect",
+          "x": 0.375048,
+          "y": 0.476071,
+          "width": 0.058571,
+          "height": 0.026032,
+          "radius": 0.000976
+        },
+        {
+          "style": "guide",
+          "type": "rect",
+          "x": 0.464857,
+          "y": 0.476071,
+          "width": 0.058571,
+          "height": 0.026032,
+          "radius": 0.000976
+        },
+        {
+          "style": "guide",
+          "type": "rect",
+          "x": 0.554667,
+          "y": 0.476071,
+          "width": 0.058571,
+          "height": 0.026032,
+          "radius": 0.000976
+        },
+        {
+          "style": "guide",
+          "type": "rect",
+          "x": 0.644476,
+          "y": 0.476071,
+          "width": 0.058571,
+          "height": 0.026032,
+          "radius": 0.000976
+        },
+        {
+          "style": "guide",
+          "type": "rect",
+          "x": 0.285238,
+          "y": 0.521627,
+          "width": 0.058571,
+          "height": 0.026032,
+          "radius": 0.000976
+        },
+        {
+          "style": "guide",
+          "type": "rect",
+          "x": 0.375048,
+          "y": 0.521627,
+          "width": 0.058571,
+          "height": 0.026032,
+          "radius": 0.000976
+        },
+        {
+          "style": "guide",
+          "type": "rect",
+          "x": 0.464857,
+          "y": 0.521627,
+          "width": 0.058571,
+          "height": 0.026032,
+          "radius": 0.000976
+        },
+        {
+          "style": "guide",
+          "type": "rect",
+          "x": 0.554667,
+          "y": 0.521627,
+          "width": 0.058571,
+          "height": 0.026032,
+          "radius": 0.000976
+        },
+        {
+          "style": "guide",
+          "type": "rect",
+          "x": 0.644476,
+          "y": 0.521627,
+          "width": 0.058571,
+          "height": 0.026032,
+          "radius": 0.000976
+        },
+        {
+          "style": "guide",
+          "type": "rect",
+          "x": 0.285238,
+          "y": 0.567183,
+          "width": 0.058571,
+          "height": 0.026032,
+          "radius": 0.000976
+        },
+        {
+          "style": "guide",
+          "type": "rect",
+          "x": 0.375048,
+          "y": 0.567183,
+          "width": 0.058571,
+          "height": 0.026032,
+          "radius": 0.000976
+        },
+        {
+          "style": "guide",
+          "type": "rect",
+          "x": 0.464857,
+          "y": 0.567183,
+          "width": 0.058571,
+          "height": 0.026032,
+          "radius": 0.000976
+        },
+        {
+          "style": "guide",
+          "type": "rect",
+          "x": 0.554667,
+          "y": 0.567183,
+          "width": 0.058571,
+          "height": 0.026032,
+          "radius": 0.000976
+        },
+        {
+          "style": "guide",
+          "type": "rect",
+          "x": 0.644476,
+          "y": 0.567183,
+          "width": 0.058571,
+          "height": 0.026032,
+          "radius": 0.000976
+        },
+        {
+          "style": "guide",
+          "type": "path",
+          "commands": [
+            [
+              "M",
+              0.09,
+              0.63877
+            ],
+            [
+              "L",
+              0.91,
+              0.63877
+            ]
+          ]
+        },
+        {
+          "style": "soft",
+          "type": "path",
+          "commands": [
+            [
+              "M",
+              0.255952,
+              0.375198
+            ],
+            [
+              "L",
+              0.255952,
+              0.661548
+            ]
+          ]
+        },
+        {
+          "style": "soft",
+          "type": "path",
+          "commands": [
+            [
+              "M",
+              0.744048,
+              0.375198
+            ],
+            [
+              "L",
+              0.744048,
+              0.661548
+            ]
+          ]
+        }
+      ]
+    }
+  }
+}
